@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Song Stories · NewJeans Chat Archive</title>
+  <link rel="icon" href="assets/bunny.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="songs-page">
+  <header class="hero">
+    <h1 class="logo" id="logo" aria-label="Song Stories"></h1>
+    <p class="tagline"><b>Ditto</b> · <b>Bubble Gum</b> · <b>How Sweet</b> · <b>Hurt</b></p>
+  </header>
+
+  <main class="songs-shell">
+    <nav class="song-tabs" id="tabs" role="tablist" aria-label="Songs"></nav>
+    <section class="card song-card" id="song" aria-live="polite"></section>
+
+    <section class="card quiz" id="quiz">
+      <h2>🔮 Which song are you?</h2>
+      <div id="quiz-body"></div>
+    </section>
+
+    <a class="jelly back-link" href="index.html">← Back to home</a>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="fx.js"></script>
+  <script src="profile.js"></script>
+  <script src="songs.js"></script>
+</body>
+</html>

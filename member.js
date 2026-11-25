@@ -18,6 +18,19 @@
   }
   m.lines.forEach((l, i) => setTimeout(() => { add(l); FX.pop(1 + i * 0.15, "triangle"); }, 250 + i * 450));
 
+  // profile sections: facts, CD shelf, photo gallery, idol journey
+  const sections = document.createElement("div");
+  sections.innerHTML = `
+    <div class="summary-card" id="m-summary"></div>
+    <div class="chips" id="m-chips"></div>
+    <h2 class="section-title">💿 EP shelf <small style="font-weight:500;font-size:.8rem">(tap a CD!)</small></h2><div id="m-shelf"></div>
+    <h2 class="section-title">📸 Cute pics <small style="font-weight:500;font-size:.8rem">(tap to flip)</small></h2><div id="m-gallery"></div>
+    <h2 class="section-title">🌟 Idol journey</h2><div id="m-journey"></div>`;
+  $("#m-msgs").after(sections);
+  $("#m-summary").textContent = m.summary;
+  [["🎂", m.born], ["📍", m.from], ["🐰", m.role]].forEach(([e, t]) => { const s = document.createElement("span"); s.textContent = e + " " + t; $("#m-chips").appendChild(s); });
+  renderShelf($("#m-shelf")); renderGallery($("#m-gallery"), m); renderJourney($("#m-journey"), m);
+
   let n = 0;
   function poke() {
     const r = m.replies[Math.floor(Math.random() * m.replies.length)];

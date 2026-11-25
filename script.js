@@ -147,6 +147,8 @@
     $("#pf-img").src = m.avatar; $("#pf-name").textContent = m.name; $("#pf-tag").textContent = m.emoji + " " + m.tagline;
     $("#pf-link").href = m.page; $("#pf-link").style.setProperty("--jc", m.color);
     $("#pf-poke").style.setProperty("--jc", m.soft);
+    $("#pf-summary").textContent = m.summary;
+    renderShelf($("#pf-shelf")); renderJourney($("#pf-journey"), m, 3);
     const box = $("#pf-msgs"); box.innerHTML = "";
     m.lines.forEach((l) => {
       const d = document.createElement("div"); d.className = "msg"; d.style.margin = "10px 0";
