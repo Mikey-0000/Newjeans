@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concert &amp; Lightstick · NewJeans Chat Archive</title>
+  <link rel="icon" href="assets/bunny.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#ff9ccf" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="game-page concert-page" data-no-player data-no-cursor data-no-pet>
+  <header class="hero">
+    <h1 class="logo" id="logo" aria-label="Concert"></h1>
+    <p class="tagline"><b>Visualiser</b> or <b>Lightstick Hero</b>: tap lanes <b>A S D</b> (or ← ↓ →) on the beat 🪄</p>
+  </header>
+  <main class="game-shell">
+    <div class="card game-card">
+      <div class="stage" id="stage">
+        <canvas id="cv" width="960" height="540" aria-label="Concert canvas"></canvas>
+        <div class="menu" id="menu">
+          <h2>Concert time 🎤</h2>
+          <div class="btn-row" style="justify-content:center" id="mode-row">
+            <button class="jelly track-btn" data-mode="viz" type="button" style="--jc:#a9e5ff" aria-pressed="true">🌈 Visualiser</button>
+            <button class="jelly track-btn" data-mode="hero" type="button" style="--jc:#ffb3dc" aria-pressed="false">🪄 Lightstick Hero</button>
+          </div>
+          <div id="track-list" class="btn-row" style="justify-content:center"></div>
+          <label class="jelly file-btn" style="--jc:#fff4a8">➕ Use my own song file
+            <input type="file" id="file" accept="audio/*,video/mp4,.m4a,.mp3,.mp4,.wav,.ogg" hidden /></label>
+          <p class="hint" id="analysis">Pick a song to analyse its beat. Your file never leaves your device.</p>
+          <button class="jelly big-btn" id="start" style="--jc:#d8f7ae" disabled>▶ Start</button>
+        </div>
+        <div class="menu hidden" id="result">
+          <h2 id="res-title">Great show!</h2><p class="song-p" id="res-body"></p>
+          <button class="jelly big-btn" id="again" style="--jc:#ffb3dc">↻ Again</button>
+          <button class="jelly" id="menu-btn" style="--jc:#fff;padding:12px 20px;font-weight:700">Menu</button>
+        </div>
+      </div>
+      <p class="hint">Visualiser: click the stage to flash the lightstick. Hero: hit the notes as they reach the glowing line.</p>
+    </div>
+    <a class="jelly back-link" href="index.html" style="justify-self:start">← Back to home</a>
+  </main>
+  <audio id="song" preload="auto"></audio>
+  <script src="data.js"></script>
+  <script src="fx.js"></script>
+  <script src="extras.js"></script>
+  <script src="beat.js"></script>
+  <script src="concert.js"></script>
+</body>
+</html>

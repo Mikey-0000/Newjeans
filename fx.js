@@ -24,6 +24,7 @@
 
   /* ---------- sound ---------- */
   let ctx, muted = safe(() => localStorage.getItem("nj-muted")) === "1";
+  FX.vol = parseFloat(safe(() => localStorage.getItem("nj-vol")) || "1"); if (isNaN(FX.vol)) FX.vol = 1;
   FX.isMuted = () => muted;
   FX.setMuted = (v) => { muted = v; safe(() => localStorage.setItem("nj-muted", v ? "1" : "0")); };
   FX.pop = function (pitch = 1, type = "sine", dur = 0.13) {
@@ -36,10 +37,21 @@
       o.frequency.setValueAtTime(320 * pitch, t);
       o.frequency.exponentialRampToValueAtTime(900 * pitch, t + dur * 0.8);
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.16, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(Math.max(0.0002, 0.16 * FX.vol), t + 0.015);
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       o.connect(g).connect(ctx.destination);
       o.start(t); o.stop(t + dur + 0.02);
+    });
+  };
+
+  FX.whoosh = function () {
+    if (muted || FX.vol <= 0) return;
+    safe(() => {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume();
+      const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
+      o.type = "triangle"; o.frequency.setValueAtTime(900, t); o.frequency.exponentialRampToValueAtTime(120, t + 0.4);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, 0.1 * FX.vol), t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
+      o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.45);
     });
   };
 

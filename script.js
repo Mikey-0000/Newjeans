@@ -82,10 +82,23 @@
   // starter messages + randomised, personality-driven chatter
   CHAT_LINES.slice(0, 3).forEach(([k, t]) => addMessage({ key: k, text: t }));
   lastSpeaker = "danielle";
+  setTimeout(async () => {
+    if (busy) return; busy = true;
+    const best = parseInt(safe(() => localStorage.getItem("nj-best")) || "0", 10) || 0;
+    if (userName) {
+      await say("minji", `${timeGreeting()}, ${userName}! 💙`, 900);
+      if (best > 0) await say("hanni", `your boba high score is ${best}, can you beat it?? 🧋`, 900);
+      else await say("hyein", `${userName}, have you played the Bunny Beat Jump game yet?`, 900);
+    } else {
+      await say("minji", `${timeGreeting()}, bunny! ✨`, 900); await say("danielle", "what should we call you? type your name!", 900); expectName = true;
+    }
+    busy = false;
+  }, 2600);
   const pick = (a) => a[Math.floor(Math.random() * a.length)];
   const recentText = [];
   function freshLine(k) {
-    const pool = VOICE[k].concat(M[k].replies);
+    const pl = personalLine(); if (pl) return pl;
+    const pool = VOICE[k].concat(M[k].replies, FX.isNight() ? NIGHT[k].concat(NIGHT[k]) : []);
     for (let i = 0; i < 6; i++) { const t = pick(pool); if (!recentText.includes(t)) { recentText.push(t); if (recentText.length > 14) recentText.shift(); return t; } }
     return pick(pool);
   }
@@ -108,6 +121,32 @@
     } finally { busy = false; }
   }
   (function loopAmbient() { setTimeout(() => { ambientOnce().finally(loopAmbient); }, rand(1600, 3400)); })();
+
+  /* ---------- the bunnies remember you ---------- */
+  let userName = safe(() => localStorage.getItem("nj-name")) || "";
+  let memory = JSON.parse(safe(() => localStorage.getItem("nj-mem")) || "[]");
+  let expectName = false;
+  const saveMem = () => safe(() => localStorage.setItem("nj-mem", JSON.stringify(memory.slice(-6))));
+  const NIGHT = {
+    minji: ["it's so late, are you drinking water? 💧", "late-night thoughts hit different ✨", "the moon is out, say hi 🌙"],
+    hanni: ["why are we awake... boba at midnight is a mood", "midnight snack time 🧋", "..............sleepy"],
+    danielle: ["night owls unite 🦉", "late-night chats are the best 💛", "stars are out, so are we ✨"],
+    haerin: ["night is better. quiet.", "meow. 🌙", "the cat is awake. unfortunately."],
+    hyein: ["3am thoughts: are clouds just sky socks?", "aliens are most active at night 👽", "ghost hours, let's go 🛸"]
+  };
+  function timeGreeting() { const h = new Date().getHours(); return h < 5 ? "it's so late" : h < 12 ? "good morning" : h < 18 ? "good afternoon" : h < 22 ? "good evening" : "good night"; }
+  function nameFromText(text) {
+    const m = text.match(/(?:my name is|i am|i'm|im|call me)\s+([A-Za-z][A-Za-z\-']{1,15})/i);
+    if (m) return m[1];
+    if (expectName && /^[A-Za-z][A-Za-z\-' ]{0,15}$/.test(text.trim()) && text.trim().split(/\s+/).length <= 2) return text.trim();
+    return "";
+  }
+  function personalLine() {
+    const r = Math.random();
+    if (userName && r < 0.35) return pick([`${userName}!! 💙`, `hi ${userName}, we missed you`, `${userName} is here! everyone say hi`, `${userName}, you okay? ✨`, `${userName}, tell us about your day`, `we love you, ${userName} 🐰`]);
+    if (memory.length && r < 0.55) { const m = pick(memory); return pick([`wait, ${userName || "you"} said "${m}" earlier, I'm still thinking about that`, `going back to "${m}" — honestly relatable`, `ok but ${userName || "bunny"}, about "${m}"...`]); }
+    return null;
+  }
 
   // keyword brain for replies
   function pickReplies(text) {
@@ -135,6 +174,13 @@
   async function userSays(text) {
     text = text.trim(); if (!text) return;
     addMessage({ me: true, text }); FX.pop(1.5); paused = true; busy = true;
+    const nm = nameFromText(text);
+    if (nm && !userName) {
+      userName = nm[0].toUpperCase() + nm.slice(1); safe(() => localStorage.setItem("nj-name", userName)); expectName = false;
+      await say("minji", `nice to meet you, ${userName}!! 💙`, 900); await say("danielle", `${userName}!! welcome to the chat 🐰`, 800);
+      paused = false; busy = false; return;
+    }
+    if (text.length > 8 && text.length < 80) { memory.push(text); saveMem(); }
     const low = text.toLowerCase();
     const sp = Object.keys(SPECIAL).find((k) => low.includes(k));
     const who = sp ? [SPECIAL[sp][1]] : pickReplies(text);
@@ -203,7 +249,7 @@
     love++; loveEl.textContent = love; safe(() => localStorage.setItem("nj-love", love));
     const r = e.currentTarget.getBoundingClientRect();
     FX.burst(r.left + r.width / 2, r.top, 7, ["💙", "💛", "💗", "🐰"]); FX.pop(1 + (love % 10) / 12);
-    if (love % 25 === 0) { FX.rain(["💙", "🐰"], 24); FX.toast(`🎉 ${love} hearts!`); }
+    if (love % 25 === 0) { FX.rain(["💙", "🐰"], 24); FX.toast(`🎉 ${love} hearts!`); if (!busy) { busy = true; say(pick(KEYS), `${love} hearts?! ${userName ? userName + ", " : ""}you really love us 🥹`, 900).then(() => (busy = false)); } }
   });
 
   $("#rain-btn").addEventListener("click", () => FX.rain());

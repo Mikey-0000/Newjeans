@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Booth · NewJeans Chat Archive</title>
+  <link rel="icon" href="assets/bunny.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#ff9ccf" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="booth-page" data-no-pet>
+  <header class="hero">
+    <h1 class="logo" id="logo" aria-label="Photo Booth"></h1>
+    <p class="tagline"><b>Add ears</b>, stickers &amp; frames, then <b>download</b> your pic 📸 (your photo never leaves your device)</p>
+  </header>
+  <main class="booth-shell">
+    <section class="card booth-card">
+      <div class="booth-canvas-wrap"><canvas id="bc" width="640" height="640" aria-label="Photo canvas"></canvas></div>
+      <div class="booth-ui">
+        <h2>1 · Pick a photo</h2>
+        <div class="btn-row">
+          <label class="jelly bb" style="--jc:#fff4a8">📁 Upload<input type="file" id="bfile" accept="image/*" hidden /></label>
+          <button class="jelly bb" id="bcam" type="button" style="--jc:#a9e5ff">📷 Camera</button>
+          <button class="jelly bb" id="bsnap" type="button" style="--jc:#ffb3dc" hidden>📸 Snap!</button>
+        </div>
+        <div class="btn-row" id="bunnies" aria-label="Use a bunny pal photo"></div>
+        <h2>2 · Decorate</h2>
+        <div class="btn-row" id="stickers"></div>
+        <div class="btn-row">
+          <button class="jelly bb" id="bears" type="button" style="--jc:#ffd6e7">🐰 Bunny ears</button>
+          <button class="jelly bb" id="bdel" type="button" style="--jc:#fff">🗑️ Delete selected</button>
+          <button class="jelly bb" id="bundo" type="button" style="--jc:#fff">↩ Undo</button>
+        </div>
+        <label class="st-row">Size <input type="range" id="bsize" min="30" max="320" value="110" aria-label="Sticker size" /></label>
+        <label class="st-row">Tilt <input type="range" id="brot" min="-45" max="45" value="0" aria-label="Sticker tilt" /></label>
+        <p class="hint">Drag stickers on the photo to move them. Tap one to select it.</p>
+        <h2>3 · Filter &amp; frame</h2>
+        <div class="btn-row" id="filters"></div>
+        <div class="btn-row" id="frames"></div>
+        <button class="jelly big-btn" id="bsave" type="button" style="--jc:#d8f7ae;margin-top:8px">⬇ Download PNG</button>
+      </div>
+    </section>
+    <a class="jelly back-link" href="index.html" style="justify-self:start">← Back to home</a>
+  </main>
+  <video id="bvid" playsinline muted hidden></video>
+  <script src="data.js"></script>
+  <script src="fx.js"></script>
+  <script src="extras.js"></script>
+  <script src="photobooth.js"></script>
+</body>
+</html>

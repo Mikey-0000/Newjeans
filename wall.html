@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fan Wall · NewJeans Chat Archive</title>
+  <link rel="icon" href="assets/bunny.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#ff9ccf" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="wall-page">
+  <header class="hero">
+    <h1 class="logo" id="logo" aria-label="Dear Bunnies"></h1>
+    <p class="tagline"><b>Write</b> a note, watch it float up 🫧 <b>Pop</b> bubbles to read them</p>
+  </header>
+  <main class="wall-shell">
+    <form class="card wall-form" id="wf" autocomplete="off">
+      <input id="wname" maxlength="16" placeholder="Your name (optional)" aria-label="Your name" />
+      <input id="wmsg" maxlength="100" placeholder="Dear Bunnies…" aria-label="Your message" required />
+      <div class="wcolors" id="wcolors" role="radiogroup" aria-label="Bubble colour"></div>
+      <button class="jelly big-btn" type="submit" style="--jc:var(--accent)">Float it ✨</button>
+    </form>
+    <section class="wall-stage" id="stage" aria-label="Floating messages"></section>
+    <p class="hint" style="text-align:center">Notes are saved in this browser only — nobody else can see them.
+      <button class="jelly" id="wclear" type="button" style="--jc:#fff;padding:4px 12px;font-weight:700;font-size:13px;margin-left:6px">Clear my notes</button></p>
+    <a class="jelly back-link" href="index.html" style="justify-self:start">← Back to home</a>
+  </main>
+  <script src="data.js"></script>
+  <script src="fx.js"></script>
+  <script src="extras.js"></script>
+  <script src="wall.js"></script>
+</body>
+</html>

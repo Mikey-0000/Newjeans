@@ -38,6 +38,55 @@
       meters: { Sweetness: 55, Energy: 30, Nostalgia: 80 },
       listen: "Hurt"
     }
+    ,
+    {
+      key: "hypeboy", title: "Hype Boy", color: "#bfe6ff", emoji: "🐰", album: "New Jeans (1st EP)", released: "Aug 1, 2022",
+      credits: "From the debut EP · the song on this site's music player",
+      sound: "Breezy, light-footed pop that feels like a summer afternoon.",
+      story: "A bright, nervous-excited song about noticing someone and not being able to stop thinking about them. It's the track that turned a lot of people into Bunnies.",
+      facts: ["Its music video came out on July 23, 2022, a week before the debut EP.", "It's the song playing in the corner of this very page.", "Part of a four-song debut EP with Attention, Cookie and Hurt.", "Got a remix from 250 on the NJWMX remix album."],
+      meters: { Sweetness: 85, Energy: 75, Nostalgia: 60 }, listen: "Hype Boy"
+    },
+    {
+      key: "attention", title: "Attention", color: "#ffd6e7", emoji: "👀", album: "New Jeans (1st EP)", released: "Jul 22, 2022",
+      credits: "The lead single that introduced NewJeans to the world",
+      sound: "Smooth, laid-back groove with a cool, almost whispery attitude.",
+      story: "The very first song the group ever released. It's a confident-but-shy opener about wanting someone to simply notice you.",
+      facts: ["Released July 22, 2022, the group's debut day.", "The full EP, New Jeans, arrived on August 1, 2022.", "Remixed by 250 on NJWMX.", "The group officially debuted with five members."],
+      meters: { Sweetness: 60, Energy: 55, Nostalgia: 70 }, listen: "Attention"
+    },
+    {
+      key: "omg", title: "OMG", color: "#ffb3dc", emoji: "💌", album: "OMG (1st single album)", released: "Jan 2, 2023",
+      credits: "Title track of the OMG single album, which also features Ditto",
+      sound: "Bouncy, playful and a little breathless, like a text that can't wait.",
+      story: "A pop song about being totally overwhelmed by a crush, the kind where every notification makes your heart jump.",
+      facts: ["It's the first single album from NewJeans.", "It came out on January 2, 2023, after Ditto's December release.", "The single album pairs OMG with Ditto.", "Its title is the text you send when you can't contain your excitement."],
+      meters: { Sweetness: 80, Energy: 85, Nostalgia: 45 }, listen: "OMG"
+    },
+    {
+      key: "supershy", title: "Super Shy", color: "#d8f7ae", emoji: "🙈", album: "Get Up (2nd EP)", released: "Jul 21, 2023",
+      credits: "Pre-released July 7, 2023 · one of three title tracks on Get Up",
+      sound: "Fresh, quick and sparkly with a skippy, upbeat heartbeat.",
+      story: "A song about being too shy to say hi to the person you like. Its co-writer has said it was inspired by her own experiences as a shy teenager.",
+      facts: ["It was the first song written for the Get Up EP.", "Pre-released on July 7, 2023, two weeks before the EP.", "The performance features powerful whacking-style arm moves.", "One of the three title tracks on Get Up."],
+      meters: { Sweetness: 85, Energy: 90, Nostalgia: 35 }, listen: "Super Shy"
+    },
+    {
+      key: "eta", title: "ETA", color: "#fff4a8", emoji: "📱", album: "Get Up (2nd EP)", released: "Jul 21, 2023",
+      credits: "One of three title tracks on Get Up",
+      sound: "Playful, bouncy beat with a bright, chatty attitude.",
+      story: "A song about waiting for someone's reply and wondering where they are. The title is the thing you text when you're impatient: what's your ETA?",
+      facts: ["It was performed at a fan meeting before the EP came out.", "One of the three title tracks of Get Up.", "Its dance is dynamic and full of energy.", "In this site's chat, Haerin loves asking “What's your ETA?” 😉"],
+      meters: { Sweetness: 65, Energy: 85, Nostalgia: 30 }, listen: "ETA"
+    },
+    {
+      key: "coolwithyou", title: "Cool With You", color: "#a9e5ff", emoji: "🌊", album: "Get Up (2nd EP)", released: "Jul 21, 2023",
+      credits: "One of three title tracks on Get Up · has Side A and Side B videos",
+      sound: "Dreamy and cool, with a floaty, cinematic feel.",
+      story: "A gentle, dreamy song about the feeling of being relaxed and completely at ease with one special person.",
+      facts: ["Its music video was released in two versions, a Side A and a Side B.", "The video feels like a short film.", "The dance is contemporary-style and flowing.", "It has passed 100 million streams."],
+      meters: { Sweetness: 75, Energy: 40, Nostalgia: 75 }, listen: "Cool With You"
+    }
   ];
 
   /* wobbly title */
