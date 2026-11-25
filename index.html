@@ -58,6 +58,12 @@
         </div>
       </section>
 
+      <section class="card" style="margin-bottom:26px">
+        <h2>💿 CD shelf</h2>
+        <div class="cd-rack" id="cd-rack"></div>
+        <p class="hint">Tap a CD to play it and sing along karaoke-style.</p>
+      </section>
+
       <section class="card">
         <h2>Play &amp; party</h2>
         <div class="btn-row">
@@ -106,6 +112,35 @@
     </div>
   </div>
 
+  <!-- CD karaoke overlay -->
+  <div class="overlay" id="cd-overlay" aria-hidden="true">
+    <div class="card modal karaoke" role="dialog" aria-modal="true" aria-labelledby="k-title">
+      <button class="jelly close-x" data-close aria-label="Close">✕</button>
+      <div class="k-top">
+        <img class="k-disc" id="k-disc" alt="" />
+        <div><h2 id="k-title">Song</h2><p class="hint" id="k-status">Loading…</p>
+          <div class="btn-row">
+            <button class="jelly" id="k-play" type="button" style="--jc:var(--accent);padding:8px 18px;font-weight:700">▶ Play</button>
+            <button class="jelly" id="k-lab" type="button" style="--jc:#fff4a8;padding:8px 14px;font-weight:700">✍️ Lyric lab</button>
+          </div></div>
+      </div>
+      <div class="k-progress" id="k-prog"><i></i></div>
+      <div class="k-lines" id="k-lines" aria-live="polite"></div>
+      <div class="k-lab" id="k-labpanel" hidden>
+        <p class="hint"><b>Your lyrics, your device.</b> Paste lyrics you own (one line per row), press <b>Start syncing</b>, then tap <b>Next line</b> (or press Enter) at the moment each line begins.</p>
+        <textarea id="k-text" rows="6" placeholder="Paste lyrics here, one line per row…" aria-label="Lyrics text"></textarea>
+        <div class="btn-row">
+          <button class="jelly" id="k-sync" type="button" style="--jc:#d8f7ae;padding:8px 14px;font-weight:700">⏱ Start syncing</button>
+          <button class="jelly" id="k-tap" type="button" style="--jc:var(--accent);padding:8px 14px;font-weight:700" disabled>Next line ⏎</button>
+          <button class="jelly" id="k-export" type="button" style="--jc:#fff;padding:8px 14px;font-weight:700">⬇ Export .lrc</button>
+          <label class="jelly" style="--jc:#fff;padding:8px 14px;font-weight:700;display:inline-block;cursor:pointer">📂 Load .lrc<input type="file" id="k-file" accept=".lrc,.txt" hidden /></label>
+          <button class="jelly" id="k-clear" type="button" style="--jc:#fff;padding:8px 14px;font-weight:700">🗑 Clear</button>
+        </div>
+      </div>
+      <audio id="k-audio" preload="auto"></audio>
+    </div>
+  </div>
+
   <!-- game overlay -->
   <div class="overlay" id="game-overlay" aria-hidden="true">
     <div class="card modal game">
@@ -123,5 +158,6 @@
   <script src="extras.js"></script>
   <script src="profile.js"></script>
   <script src="script.js"></script>
+  <script src="cdplayer.js"></script>
 </body>
 </html>
