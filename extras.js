@@ -27,8 +27,11 @@
   panel.innerHTML = `
     <div class="st-links">${pages.map(([h, t]) => `<a class="jelly st-link${h === here ? " here" : ""}" href="${h}">${t}</a>`).join("")}</div>
     <label class="st-row"><span>🌙 Night mode</span><input type="checkbox" id="st-night" /></label>
+    <label class="st-row"><span>🪄 Lightstick cursor</span><input type="checkbox" id="st-cur" /></label>
     <label class="st-row"><span>🔊 UI sounds</span><input type="range" id="st-vol" min="0" max="1" step="0.05" aria-label="UI sound volume" /></label>`;
   body.append(gear, panel);
+  $("#st-cur").checked = FX.cursorOn ? FX.cursorOn() : false; $("#st-cur").disabled = !FX.setCursor;
+  $("#st-cur").addEventListener("change", (e) => { FX.setCursor && FX.setCursor(e.target.checked); FX.toast(e.target.checked ? "🪄 Lightstick cursor on" : "Normal cursor"); });
   $("#st-night").checked = FX.isNight(); $("#st-vol").value = FX.vol;
   $("#st-night").addEventListener("change", (e) => { applyNight(e.target.checked); FX.toast(e.target.checked ? "🌙 Night mode" : "☀️ Day mode"); FX.pop(e.target.checked ? 0.6 : 1.5); });
   $("#st-vol").addEventListener("input", (e) => { FX.vol = parseFloat(e.target.value); set("nj-vol", FX.vol); FX.pop(1.2); });

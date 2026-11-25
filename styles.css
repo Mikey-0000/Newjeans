@@ -89,12 +89,12 @@ button.jelly:active, a.jelly:active {
 
 /* ---------- cursor + particles ---------- */
 #cursor {
-  position: fixed; left: 0; top: 0; width: 46px; z-index: 99999; pointer-events: none;
-  transform: translate(-30%, -20%); filter: drop-shadow(0 4px 4px rgba(35,32,58,.25));
-  transition: scale .15s ease, rotate .15s ease;
+  position: fixed; left: 0; top: 0; width: 34px; z-index: 99999; pointer-events: none; will-change: transform;
+  transform-origin: 50% 12%; filter: drop-shadow(0 3px 3px rgba(35,32,58,.3)) drop-shadow(0 0 5px rgba(160,220,255,.7));
+  transition: filter .2s;
 }
-#cursor.down { scale: .8; rotate: -12deg; }
-#cursor.hot  { scale: 1.25; rotate: 8deg; }
+#cursor.hot { filter: drop-shadow(0 3px 3px rgba(35,32,58,.3)) drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px var(--accent)); }
+#cursor.down { filter: drop-shadow(0 0 14px #fff) drop-shadow(0 0 26px var(--accent)); }
 .particle { position: fixed; z-index: 99998; pointer-events: none; font-size: 22px; will-change: transform, opacity; }
 
 /* ---------- title ---------- */

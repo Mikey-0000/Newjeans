@@ -123,30 +123,31 @@
     });
   }
 
-  /* ---------- bunny cursor ---------- */
+  /* ---------- lightstick cursor: locked to the pointer, no lag ---------- */
   function buildCursor() {
     if (!finePointer) return;
     const c = document.createElement("img");
-    c.id = "cursor"; c.src = "assets/bunny.png"; c.alt = ""; c.setAttribute("aria-hidden", "true");
+    c.id = "cursor"; c.src = "assets/lightstick.png"; c.alt = ""; c.setAttribute("aria-hidden", "true"); c.draggable = false;
     document.body.appendChild(c);
-    document.body.classList.add("has-cursor");
-    let tx = -100, ty = -100, x = -100, y = -100, lx = 0, ly = 0;
+    const on = safe(() => localStorage.getItem("nj-cursor")) !== "0";
+    document.body.classList.toggle("has-cursor", on); c.style.display = on ? "" : "none";
+    FX.setCursor = (v) => { safe(() => localStorage.setItem("nj-cursor", v ? "1" : "0")); document.body.classList.toggle("has-cursor", v); c.style.display = v ? "" : "none"; };
+    FX.cursorOn = () => document.body.classList.contains("has-cursor");
+    let tilt = 0, lastX = 0, lastSpark = 0;
     addEventListener("mousemove", (e) => {
-      tx = e.clientX; ty = e.clientY;
-      const hot = e.target.closest && e.target.closest("button, a, input, .floater, .bubble, .progress, #lightstick");
-      c.classList.toggle("hot", !!hot);
-      if (Math.hypot(tx - lx, ty - ly) > 38) {
-        lx = tx; ly = ty;
-        const s = document.createElement("div");
-        s.className = "particle"; s.style.fontSize = rand(12, 20) + "px";
-        s.textContent = ["✨", "💙", "⭐", "🫧"][Math.floor(Math.random() * 4)];
-        s.style.left = tx + "px"; s.style.top = ty + "px"; document.body.appendChild(s);
-        s.animate([{ transform: "translate(-50%,-50%) scale(1)", opacity: 0.9 }, { transform: `translate(-50%, calc(-50% + 26px)) scale(.2) rotate(${rand(-120, 120)}deg)`, opacity: 0 }], { duration: 750 }).onfinish = () => s.remove();
+      // tip of the lightstick sits exactly on the pointer; it leans gently with horizontal movement
+      tilt += (Math.max(-18, Math.min(18, (e.clientX - lastX) * 1.2)) - tilt) * 0.35; lastX = e.clientX;
+      c.style.transform = `translate(${e.clientX - 17}px, ${e.clientY - 10}px) rotate(${-14 + tilt}deg)`;
+      c.classList.toggle("hot", !!(e.target.closest && e.target.closest("button, a, input, .floater, .bubble, .progress, #lightstick, .polaroid, .cd-item")));
+      const now = performance.now();
+      if (now - lastSpark > 90 && Math.hypot(e.movementX || 0, e.movementY || 0) > 6) {
+        lastSpark = now; const s = document.createElement("div"); s.className = "particle"; s.style.fontSize = rand(10, 16) + "px"; s.textContent = "✨";
+        s.style.left = e.clientX + "px"; s.style.top = e.clientY + "px"; document.body.appendChild(s);
+        s.animate([{ transform: "translate(-50%,-50%) scale(1)", opacity: 0.8 }, { transform: "translate(-50%, calc(-50% + 18px)) scale(.2)", opacity: 0 }], { duration: 600 }).onfinish = () => s.remove();
       }
     });
-    addEventListener("mousedown", () => c.classList.add("down"));
-    addEventListener("mouseup", () => c.classList.remove("down"));
-    (function loop() { x += (tx - x) * 0.28; y += (ty - y) * 0.28; c.style.left = x + "px"; c.style.top = y + "px"; requestAnimationFrame(loop); })();
+    addEventListener("mousedown", () => c.classList.add("down")); addEventListener("mouseup", () => c.classList.remove("down"));
+    c.style.transform = "translate(-100px,-100px)";
   }
 
   /* ---------- global click: burst + wobble ---------- */
