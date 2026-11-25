@@ -544,7 +544,7 @@ body.night .credit-text small { color: #27415a; }
 .cd-rack { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 .cd-disc { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 6px; width: 140px; text-align: center; font-weight: 700; font-size: 13px; }
 .cd-disc:focus-visible { outline: 3px dashed var(--ink); outline-offset: 6px; border-radius: 16px; }
-.cd-disc img { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--ink); box-shadow: 0 6px 0 var(--ink), 0 14px 18px rgba(35,32,58,.2); animation: cdSpin 8s linear infinite; transition: scale .25s cubic-bezier(.3,1.7,.5,1); background: #fff; }
+.cd-disc img { width: 130px; height: 130px; border-radius: 50%; border: 0; box-shadow: 0 8px 16px rgba(35,32,58,.22); animation: cdSpin 8s linear infinite; transition: scale .25s cubic-bezier(.3,1.7,.5,1); background: #fff; }
 .cd-disc:hover img { scale: 1.1; animation-duration: 1.6s !important; }
 .karaoke { width: min(560px, 100%); }
 .k-top { display: flex; gap: 16px; align-items: center; margin-bottom: 10px; }
