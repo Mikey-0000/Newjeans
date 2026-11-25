@@ -3,7 +3,7 @@
   const { $, safe } = FX;
   const DISCS = [
     { key: "ditto", title: "Ditto", img: "assets/cd-ditto.png", audio: ["music/ditto.m4a", "music/Ditto.m4a", "music/ditto.mp3"] },
-    { key: "hypeboy", title: "Hype Boy (debut EP)", img: "assets/cd-debut.png", audio: ["music/Hype%20Boy.m4a"] }
+    { key: "howsweet", title: "How Sweet", img: "assets/cd-howsweet.png", audio: ["music/how-sweet.mp3", "music/How Sweet.mp3", "music/How%20Sweet.mp3", "music/howsweet.mp3", "music/how-sweet.m4a", "music/How%20Sweet.m4a"] }
   ];
   const rack = $("#cd-rack"), ov = $("#cd-overlay"), au = $("#k-audio"), lines = $("#k-lines");
   let cur = null, data = [], active = -1, rafId = 0, syncing = false, syncIdx = 0, stamps = [], rawLines = [];
