@@ -609,3 +609,8 @@ body.tv-open .layout { z-index: 60; }
 @keyframes hubBob { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12) rotate(-6deg); } }
 .theatre.expanded .theatre-head { padding-right: 62px; box-sizing: border-box; }
 .main-col { min-width: 0; }
+
+/* no outline/flash when a CD is clicked */
+.cd-disc, .cd-item { -webkit-tap-highlight-color: transparent; outline: none !important; }
+.cd-disc:focus, .cd-disc:focus-visible, .cd-disc:active, .cd-item:focus, .cd-item:focus-visible { outline: none !important; }
+.cd-disc:focus-visible img { filter: drop-shadow(0 0 8px #ff9ccd); }
