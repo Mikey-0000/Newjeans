@@ -548,7 +548,7 @@ body.night .credit-text small { color: #27415a; }
 .cd-disc:hover img { scale: 1.1; animation-duration: 1.6s !important; }
 .karaoke { width: min(560px, 100%); }
 .k-top { display: flex; gap: 16px; align-items: center; margin-bottom: 10px; }
-.k-disc { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--ink); box-shadow: 0 5px 0 var(--ink); animation: cdSpin 10s linear infinite; flex-shrink: 0; background: #fff; }
+.k-disc { width: 110px; height: 110px; border-radius: 50%; border: 0; box-shadow: 0 6px 14px rgba(35,32,58,.25); animation: cdSpin 10s linear infinite; flex-shrink: 0; background: #fff; }
 .k-disc.playing { animation-duration: 2.2s; }
 .k-top h2 { margin: 0 0 4px; font-size: 1.5rem; }
 .k-progress { height: 14px; background: #fff; border: 3px solid var(--ink); border-radius: 99px; overflow: hidden; cursor: pointer; margin-bottom: 10px; position: relative; }
