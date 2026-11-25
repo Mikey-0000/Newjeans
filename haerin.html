@@ -4,42 +4,31 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Haerin</title>
+  <link rel="icon" href="assets/bunny.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="member-page">
+<body class="member-page" data-member="haerin">
   <main class="member-shell">
-    <section class="member-panel">
-      <h1 class="member-title">Haerin</h1>
-
-      <div class="msg">
-        <img class="avatar" src="images/haerin.jpg" alt="Haerin avatar" />
-        <div class="msg-content">
-          <div class="name">Haerin</div>
-          <div class="bubble small">와</div>
-          <div class="time">11:55</div>
+    <section class="card member-panel">
+      <div class="member-hero">
+        <img class="photo" id="m-photo" alt="Haerin avatar" src="images/haerin.jpg" title="Poke me!" />
+        <div>
+          <h1 class="member-title" id="m-name">Haerin</h1>
+          <p class="member-sub" id="m-sub"></p>
         </div>
       </div>
-
-      <div class="msg">
-        <img class="avatar" src="images/haerin.jpg" alt="Haerin avatar" />
-        <div class="msg-content">
-          <div class="name">Haerin</div>
-          <div class="bubble">People say I remind them of a very sly but shy cat ;)</div>
-          <div class="time">11:56</div>
-        </div>
+      <div id="m-msgs"></div>
+      <div class="pager">
+        <a class="jelly" id="m-prev" href="index.html">← Prev</a>
+        <button class="jelly" id="m-poke" style="--jc:var(--accent-soft)">👉 Poke Haerin</button>
+        <a class="jelly" id="m-next" href="index.html">Next →</a>
       </div>
-
-      <div class="msg">
-        <img class="avatar" src="images/haerin.jpg" alt="Haerin avatar" />
-        <div class="msg-content">
-          <div class="name">Haerin</div>
-          <div class="bubble small">What's your ETA?</div>
-          <div class="time">11:57</div>
-        </div>
-      </div>
-
-      <a class="back-link" href="index.html">← Back to home</a>
+      <div class="member-nav" id="m-nav" aria-label="Members"></div>
+      <a class="jelly back-link" href="index.html">← Back to home</a>
     </section>
   </main>
+  <script src="data.js"></script>
+  <script src="fx.js"></script>
+  <script src="member.js"></script>
 </body>
 </html>

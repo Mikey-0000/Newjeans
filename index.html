@@ -4,92 +4,99 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NewJeans Chat Archive</title>
+  <meta name="description" content="A jelly-soft, interactive NewJeans group chat archive." />
+  <link rel="icon" href="assets/bunny.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-  <audio controls autoplay loop>
-  <source src="music/hypeboy.m4a" type="audio/mpeg">
-</audio>
 <body class="home-page">
-  <img id="cursor" src="bunny.png" alt="Bunny cursor" />
+  <div id="floaters" aria-hidden="true"></div>
 
-  <div class="floating-chat" aria-hidden="true">
-    <div class="float-bubble">boba!!! 🧋</div>
-    <div class="float-bubble">hehe</div>
-    <div class="float-bubble">와</div>
-    <div class="float-bubble">오늘 Music is the FUTURE!!</div>
-    <div class="float-bubble">bubble tea time</div>
-  </div>
+  <header class="hero">
+    <h1 class="logo" id="logo" aria-label="NewJeans Chat Archive"></h1>
+    <p class="tagline"><b>Psst!</b> type in the chat, pop things, drag the bubbles, wave the lightstick 🐰</p>
+  </header>
 
-  <div id="notification"></div>
-
-  <main class="page-shell">
-    <section class="chat-panel">
-      <div class="chat-header">
-        <div class="chat-header-left">
-          <div class="chat-dot"></div>
-          <div>
-            <h1>NewJeans Chat Archive</h1>
-            <p>Live group chat</p>
-          </div>
-        </div>
+  <main class="layout">
+    <section class="card phone" aria-label="Group chat">
+      <div class="phone-head">
+        <div class="live-dot"></div>
+        <div><h2>Bunnies Group Chat</h2><small id="online-label">5 online · live</small></div>
+        <div class="online-stack" id="online-stack"></div>
       </div>
 
-      <div id="live-chat" class="live-chat"></div>
+      <div id="live-chat" class="live-chat" aria-live="polite"></div>
+      <div id="typing" class="typing hidden"><span id="typing-name">Someone</span> is typing <i></i><i></i><i></i></div>
 
-      <div id="typing" class="typing hidden">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-
-      <div class="member-links">
-        <div class="msg">
-          <img class="avatar" src="images/minji.jpg" alt="Minji avatar" />
-          <div class="msg-content">
-            <div class="name">Minji</div>
-            <a href="minji.html" class="bubble small link-bubble">Open Minji's page</a>
-          </div>
-        </div>
-
-        <div class="msg">
-          <img class="avatar" src="images/hanni.jpg" alt="Hanni avatar" />
-          <div class="msg-content">
-            <div class="name">Hanni</div>
-            <a href="hanni.html" class="bubble small link-bubble">Open Hanni's page</a>
-          </div>
-        </div>
-
-        <div class="msg">
-          <img class="avatar" src="images/danielle.jpg" alt="Danielle avatar" />
-          <div class="msg-content">
-            <div class="name">Danielle</div>
-            <a href="danielle.html" class="bubble small link-bubble">Open Danielle's page</a>
-          </div>
-        </div>
-
-        <div class="msg">
-          <img class="avatar" src="images/haerin.jpg" alt="Haerin avatar" />
-          <div class="msg-content">
-            <div class="name">Haerin</div>
-            <a href="haerin.html" class="bubble small link-bubble">Open Haerin's page</a>
-          </div>
-        </div>
-
-        <div class="msg">
-          <img class="avatar" src="images/hyein.jpg" alt="Hyein avatar" />
-          <div class="msg-content">
-            <div class="name">Hyein</div>
-            <a href="hyein.html" class="bubble small link-bubble">Open Hyein's page</a>
-          </div>
-        </div>
+      <form class="composer" id="composer" autocomplete="off">
+        <input id="msg-input" type="text" maxlength="140" placeholder="Say something to the bunnies…" aria-label="Your message" />
+        <button class="jelly" type="submit" aria-label="Send message">Send</button>
+      </form>
+      <div class="quick" id="quick">
+        <button class="jelly" data-say="boba?? 🧋">🧋 boba?</button>
+        <button class="jelly" data-say="Hype Boy is a bop">🎵 Hype Boy</button>
+        <button class="jelly" data-say="meow">🐱 meow</button>
+        <button class="jelly" data-say="I love you bunnies 💙">💙 love</button>
+        <button class="jelly" data-say="Ditto!">🌙 Ditto</button>
       </div>
     </section>
+
+    <aside class="side">
+      <section class="card" style="margin-bottom:26px">
+        <h2>Pick a member</h2>
+        <div class="member-grid" id="members"></div>
+        <p class="hint">Tap one for their profile + theme colour. Everyone has their own page too.</p>
+      </section>
+
+      <section class="card" style="margin-bottom:26px">
+        <h2>Bunny love 💙</h2>
+        <div class="stat-row">
+          <button class="jelly big-btn" id="love-btn" aria-label="Send bunny love">🐰 Tap me!</button>
+          <div class="counter"><span id="love-count">0</span><small>hearts sent</small></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Play &amp; party</h2>
+        <div class="btn-row">
+          <button class="jelly" id="game-btn" style="--jc:#d8f7ae">🧋 Boba Pop game</button>
+          <button class="jelly" id="rain-btn" style="--jc:#bfe6ff">🌧️ Bunny rain</button>
+          <button class="jelly" id="shuffle-btn" style="--jc:#fff4a8">🫧 Shake bubbles</button>
+        </div>
+        <p class="hint">Hint: click the logo letters, or the lightstick in the corner 👀</p>
+      </section>
+    </aside>
   </main>
 
+  <img id="lightstick" src="assets/lightstick.png" alt="NewJeans lightstick — click to start concert mode" role="button" tabindex="0" />
+  <div class="ls-tip" id="ls-tip">click me ✨</div>
+
+  <!-- profile modal -->
+  <div class="overlay" id="profile-overlay" aria-hidden="true">
+    <div class="card modal" role="dialog" aria-modal="true" aria-labelledby="pf-name">
+      <button class="jelly close-x" data-close aria-label="Close">✕</button>
+      <div class="profile-top"><img id="pf-img" alt="" /><div><h2 id="pf-name"></h2><p id="pf-tag"></p></div></div>
+      <div id="pf-msgs"></div>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="jelly go-page" id="pf-link" href="#">Open full page →</a>
+        <button class="jelly" id="pf-poke" style="padding:10px 18px;font-weight:700">👉 Poke</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- game overlay -->
+  <div class="overlay" id="game-overlay" aria-hidden="true">
+    <div class="card modal game">
+      <button class="jelly close-x" data-close aria-label="Close game">✕</button>
+      <h2>🧋 Boba Pop!</h2>
+      <div class="game-hud"><span>Score: <b id="g-score">0</b></span><span>Time: <b id="g-time">20</b>s</span><span>Best: <b id="g-best">0</b></span></div>
+      <div class="arena" id="arena">
+        <div class="game-msg" id="g-msg"><div id="g-msg-text">Pop 🧋 +1 and ⭐ +3. Dodge 🌶️ (−2)!</div><button class="jelly big-btn" id="g-start" style="margin:auto;--jc:#d8f7ae">Start!</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="fx.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
-<div class="sticker">⭐</div>
-<div class="sticker">💿</div>
-<div class="sticker">🐰</div>
-<div class="sticker">🫧</div>
