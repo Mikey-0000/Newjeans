@@ -28,7 +28,7 @@
   /* ---------- chat ---------- */
   const chat = $("#live-chat"), typing = $("#typing"), typingName = $("#typing-name");
   const hhmm = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
-  let paused = false, lineIdx = 3;
+  let paused = false, lastRow = null, lastSpeaker = null, busy = false;
 
   function addMessage({ key, text, me }) {
     const m = key ? M[key] : null;
@@ -62,6 +62,7 @@
     chat.appendChild(row);
     while (chat.children.length > 60) chat.removeChild(chat.firstChild);
     chat.scrollTop = chat.scrollHeight;
+    lastRow = { row, rx };
   }
   function react(container, emoji) {
     let chip = [...container.children].find((c) => c.dataset.e === emoji);
@@ -78,14 +79,35 @@
     });
   }
 
-  // starter messages + ambient chatter
+  // starter messages + randomised, personality-driven chatter
   CHAT_LINES.slice(0, 3).forEach(([k, t]) => addMessage({ key: k, text: t }));
-  function ambient() {
-    if (paused || document.hidden) return;
-    const [k, t] = CHAT_LINES[lineIdx % CHAT_LINES.length]; lineIdx++;
-    paused = true; say(k, t, 1100).then(() => (paused = false));
+  lastSpeaker = "danielle";
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const recentText = [];
+  function freshLine(k) {
+    const pool = VOICE[k].concat(M[k].replies);
+    for (let i = 0; i < 6; i++) { const t = pick(pool); if (!recentText.includes(t)) { recentText.push(t); if (recentText.length > 14) recentText.shift(); return t; } }
+    return pick(pool);
   }
-  setInterval(ambient, 5200);
+  async function playThread() {
+    const th = pick(THREADS);
+    for (const [k, t] of th) { await say(k, t, rand(800, 1500)); lastSpeaker = k; await new Promise((r) => setTimeout(r, rand(200, 600))); }
+  }
+  async function ambientOnce() {
+    if (busy || paused || document.hidden) return;
+    busy = true;
+    const r = Math.random();
+    try {
+      if (r < 0.22) await playThread();
+      else if (r < 0.34 && lastRow) { // a member reacts to the last message
+        const k = pick(KEYS.filter((x) => x !== lastSpeaker)); react(lastRow.rx, pick(["💙", "😂", "✨", "🧋", "🐰", "💛"])); FX.pop(1.3);
+      } else {
+        const k = pick(KEYS.filter((x) => x !== lastSpeaker)); await say(k, freshLine(k), rand(700, 1300)); lastSpeaker = k;
+        if (Math.random() < 0.3) { const k2 = pick(KEYS.filter((x) => x !== k)); await say(k2, freshLine(k2), rand(700, 1200)); lastSpeaker = k2; }
+      }
+    } finally { busy = false; }
+  }
+  (function loopAmbient() { setTimeout(() => { ambientOnce().finally(loopAmbient); }, rand(1600, 3400)); })();
 
   // keyword brain for replies
   function pickReplies(text) {
@@ -112,17 +134,17 @@
   };
   async function userSays(text) {
     text = text.trim(); if (!text) return;
-    addMessage({ me: true, text }); FX.pop(1.5); paused = true;
+    addMessage({ me: true, text }); FX.pop(1.5); paused = true; busy = true;
     const low = text.toLowerCase();
     const sp = Object.keys(SPECIAL).find((k) => low.includes(k));
     const who = sp ? [SPECIAL[sp][1]] : pickReplies(text);
     for (let i = 0; i < Math.min(who.length, 2); i++) {
       const k = who[i];
-      const pool = M[k].replies;
+      const pool = M[k].replies.concat(VOICE[k]);
       const line = sp && i === 0 ? SPECIAL[sp][0] : pool[Math.floor(Math.random() * pool.length)];
       await say(k, line, 900 + i * 500);
     }
-    paused = false;
+    paused = false; busy = false;
   }
   $("#composer").addEventListener("submit", (e) => { e.preventDefault(); const i = $("#msg-input"); const v = i.value; i.value = ""; userSays(v); });
   $("#quick").addEventListener("click", (e) => { const b = e.target.closest("[data-say]"); if (b) userSays(b.dataset.say); });
@@ -159,7 +181,7 @@
     openOverlay(pOv);
   }
   $("#pf-poke").addEventListener("click", () => {
-    const m = M[currentKey], r = m.replies[Math.floor(Math.random() * m.replies.length)];
+    const m = M[currentKey], pool = m.replies.concat(VOICE[currentKey]), r = pool[Math.floor(Math.random() * pool.length)];
     const d = document.createElement("div"); d.className = "msg live-in"; d.style.margin = "10px 0";
     const c = document.createElement("div"); c.className = "msg-content";
     const b = document.createElement("div"); b.className = "bubble small"; b.textContent = r; b.style.setProperty("--jc", m.color);

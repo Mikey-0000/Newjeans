@@ -16,7 +16,7 @@
     const t = document.createElement("span"); t.className = "time"; t.textContent = l.time;
     c.append(n, b, t); d.append(a, c); box.appendChild(d);
   }
-  m.lines.forEach((l, i) => setTimeout(() => { add(l); FX.pop(1 + i * 0.15, "triangle"); }, 250 + i * 450));
+  m.lines.concat(m.extra || []).forEach((l, i) => setTimeout(() => { add(l); FX.pop(1 + i * 0.15, "triangle"); }, 250 + i * 450));
 
   // profile sections: facts, CD shelf, photo gallery, idol journey
   const sections = document.createElement("div");
@@ -33,7 +33,7 @@
 
   let n = 0;
   function poke() {
-    const r = m.replies[Math.floor(Math.random() * m.replies.length)];
+    const pool = m.replies.concat(VOICE[key]), r = pool[Math.floor(Math.random() * pool.length)];
     const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
     add({ text: r, small: true, time: now }); FX.squish($("#m-photo")); FX.pop(1.3);
     const el = $("#m-photo").getBoundingClientRect();
