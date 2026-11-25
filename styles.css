@@ -776,3 +776,4 @@ body.rm .loader * { animation-duration: 1.6s !important; animation-iteration-cou
 .motd { display: inline-block; margin: 8px auto 0; padding: 6px 16px; font-weight: 600; font-size: 15px; }
 .motd b { font-weight: 800; }
 .hero { text-align: center; }
+.lat { font-weight: 700; min-width: 56px; text-align: center; font-size: 14px; }

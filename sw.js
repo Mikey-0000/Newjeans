@@ -1,5 +1,5 @@
 /* Network-first service worker: always fresh when online, works offline from cache. */
-const CACHE = "nj-v4";
+const CACHE = "nj-v5";
 self.addEventListener("install", (e) => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (e) => {

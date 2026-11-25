@@ -17,30 +17,40 @@
   const V = 330;            // world speed px/s
   const PX = 230;           // player screen x
   const BASE_Y = 430, LANE = 52;
-  let tracks = [], cur = null, beat = { bpm: 100, offset: 0 }, level = null;
+  let tracks = [], cur = null, beat = { bpm: 100, offset: 0, beats: [], accents: [], down: 0 }, level = null, latency = 0;
   let running = false, over = false, t = 0, lastA = 0, lastP = 0;
   let P, score, combo, maxCombo, hearts, perfects, pearlsGot, pearlsTotal, floaters = [], parts = [];
 
-  /* ---------- level from beat grid ---------- */
+  /* ---------- level from the song's real beat times ---------- */
+  const synthGrid = (bpm, off, dur) => { const p = 60 / bpm, a = []; for (let t = off; t < dur + 2; t += p) a.push(t); return a; };
+  function nearBeat(time0) { const time = time0 - latency; // binary search: distance to the nearest beat, phase since the last beat, local period
+    const B = beat.beats; if (!B.length) return { d: 1, ph: 0, p: 0.6 };
+    let lo = 0, hi = B.length - 1; while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (B[mid] <= time) lo = mid; else hi = mid; }
+    const p = Math.max(0.2, B[hi] - B[lo]), ph = Math.max(0, Math.min(1, (time - B[lo]) / p));
+    return { d: Math.min(Math.abs(time - B[lo]), Math.abs(B[hi] - time)), ph, p };
+  }
   function buildLevel(dur) {
-    const p = 60 / beat.bpm, m = beat.bpm > 135 ? 4 : 2, u = m * p;
+    const B = beat.beats.map((x) => x + latency), n = B.length;
+    const per = (i) => (i + 1 < n ? B[i + 1] - B[i] : B[i] - B[Math.max(0, i - 1)]) || 0.6;
+    const at = (i) => (i < n ? B[i] : B[n - 1] + (i - n + 1) * per(n - 1));
+    const avgP = (B[n - 1] - B[0]) / Math.max(1, n - 1) || 0.6, m = avgP < 0.45 ? 4 : 2;
     const plats = [], pearls = [];
-    let lane = 0, seed = 7;
-    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-    plats.push({ ts: -6, te: beat.offset + 0.5 * p - 0.25 * p + 1.5 * u * 0 + 0.0, lane: 0, col: 0 }); // starting runway
-    plats[0].te = beat.offset - 0.25 * p + 0.75 * u;
-    let i = 0;
-    for (let ts = beat.offset - 0.25 * p + u; ts < dur + 1; ts += u, i++) {
+    let lane = 0, seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    plats.push({ ts: -6, te: at(0) - 0.25 * per(0) + 0.75 * (at(m) - at(0)), lane: 0, col: 0 });
+    for (let k = m, i = 0; at(k) - 0.25 * per(Math.min(k, n - 1)) < dur + 1; k += m, i++) {
+      const ts = at(k) - 0.25 * per(Math.min(k, n - 1)), te = ts + 0.75 * (at(k + m) - at(k));
       const r = rnd(); lane = Math.max(0, Math.min(3, lane + (r < 0.33 ? -1 : r < 0.66 ? 0 : 1)));
-      const pl = { ts, te: ts + 0.75 * u, lane, col: (i % 5) };
-      plats.push(pl);
-      // pearls on beats inside platform
-      for (let tb = Math.ceil((pl.ts + 0.05 - beat.offset) / p) * p + beat.offset; tb < pl.te; tb += p) {
-        const idx = Math.round((tb - beat.offset) / p), star = idx % 8 === 0;
-        pearls.push({ t: tb, y: BASE_Y - lane * LANE - (star ? 150 : 95), star, got: false, miss: false });
-      }
+      const pl = { ts, te, lane, col: i % 5 }; plats.push(pl);
+      for (let j = k; j < k + m + 1; j++) { const tb = at(j); if (tb < pl.ts + 0.05 || tb >= pl.te) continue; const star = (j - beat.down) % 8 === 0; pearls.push({ t: tb, y: BASE_Y - lane * LANE - (star ? 150 : 95), star, got: false, miss: false }); }
     }
-    return { plats, pearls, p, u, dur };
+    // accent pearls: strong off-beat hits in the music (vocal / synth / snare accents)
+    let lastA = -9; const sorted = beat.accents.filter((a) => a.s > 3).sort((x, y) => x.t - y.t);
+    for (const a of sorted) {
+      const t0 = a.t + latency; if (t0 - lastA < 0.4) continue; const pl = plats.find((q) => q.ts + 0.1 <= t0 && q.te - 0.1 >= t0); if (!pl) continue;
+      if (pearls.some((q) => Math.abs(q.t - t0) < 0.16)) continue; pearls.push({ t: t0, y: BASE_Y - pl.lane * LANE - 125, star: false, acc: true, got: false, miss: false }); lastA = t0;
+    }
+    pearls.sort((x, y) => x.t - y.t);
+    return { plats, pearls, p: avgP, u: m * avgP, dur };
   }
   const platTop = (pl) => BASE_Y - pl.lane * LANE;
   const platAt = (time, ytop) => level.plats.find((pl) => pl.ts <= time && pl.te >= time);
@@ -105,7 +115,7 @@
         P.y = top; P.vy = 0;
         if (!P.ground) {
           P.ground = true; P.jumps = 0; P.sq = 0.62;
-          const d = Math.abs(((t - beat.offset) / p) - Math.round((t - beat.offset) / p)) * p;
+          const d = nearBeat(t).d;
           let lanePitch = 0.9 + pl.lane * 0.18;
           if (d < 0.09) { perfects++; score += 50; say("PERFECT!", PX, P.y - 80, "#c2307f"); FX.pop(lanePitch + 0.5, "sine", .18); burst(PX, P.y, 8, "#ffd84d"); }
           else if (d < 0.18) { score += 15; say("good", PX, P.y - 70, "#1b78a8"); FX.pop(lanePitch, "sine", .12); }
@@ -124,7 +134,7 @@
       const x = PX + (pe.t - t) * V;
       if (Math.hypot(x - PX, pe.y - (P.y - 34)) < 44) {
         pe.got = true; pearlsGot++; combo++; maxCombo = Math.max(maxCombo, combo);
-        const pts = (pe.star ? 30 : 10) * (1 + Math.floor(combo / 10)); score += pts;
+        const pts = (pe.star ? 30 : pe.acc ? 15 : 10) * (1 + Math.floor(combo / 10)); score += pts;
         FX.pop(1.2 + (combo % 8) * 0.08, "sine", .1); burst(x, pe.y, 6, pe.star ? "#ffd84d" : "#a9e5ff");
         if (combo % 10 === 0) say(`${combo} combo!`, PX + 60, P.y - 100, "#c2307f");
       } else if (x < PX - 60) { pe.miss = true; combo = 0; }
@@ -139,7 +149,7 @@
   const COLS = ["#d8f7ae", "#ffb3dc", "#a9e5ff", "#fff4a8", "#dccaff"];
   function rr(x, y, w, h, r) { g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, r) : g.rect(x, y, w, h); }
   function draw() {
-    const p = level.p, ph = (((t - beat.offset) / p) % 1 + 1) % 1, pulse = Math.max(0, 1 - ph * 2.5);
+    const nb = nearBeat(t), ph = nb.ph, pulse = Math.max(0, 1 - ph * 2.5);
     const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, "#cfe9ff"); bg.addColorStop(.55, "#ffd6e7"); bg.addColorStop(1, "#dff8ef");
     g.fillStyle = bg; g.fillRect(0, 0, W, H);
     // beat rings
@@ -160,8 +170,8 @@
     // pearls
     for (const pe of level.pearls) {
       if (pe.got) continue; const x = PX + (pe.t - t) * V; if (x < -30 || x > W + 30) continue;
-      const bob = Math.sin(t * 6 + pe.t) * 4, r = (pe.star ? 17 : 13) + pulse * 3;
-      g.font = r * 2 + "px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(pe.star ? "⭐" : "🧋", x, pe.y + bob);
+      const bob = Math.sin(t * 6 + pe.t) * 4, r = (pe.star ? 17 : pe.acc ? 10 : 13) + pulse * 3;
+      g.font = r * 2 + "px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(pe.star ? "⭐" : pe.acc ? "💗" : "🧋", x, pe.y + bob);
     }
     // bunny
     const sq = P.sq, bw = 60 / sq, bh = 82 * sq * (bunny.naturalHeight ? 1 : 1);
@@ -194,17 +204,22 @@
 
   /* ---------- menu / loading ---------- */
   const status = $("#analysis"), startBtn = $("#start"), tune = $("#tune"), bpmIn = $("#bpm");
-  function applyBeat() { beat.bpm = parseFloat(bpmIn.value) || beat.bpm; level = buildLevel(cur.duration); reset_idle(); }
+  let base = null;
   function reset_idle() { reset(); running = false; t = 0; }
+  function applyBeat() { level = buildLevel(cur.duration); reset_idle(); }
+  function rebuildGrid() { // user typed a BPM: use a perfectly even grid from the first tracked beat
+    const off = (base && base.beats[0]) || beat.offset; beat.bpm = parseFloat(bpmIn.value) || beat.bpm; beat.beats = synthGrid(beat.bpm, off, cur.duration); applyBeat();
+  }
+  function nudge(ms) { latency += ms / 1000; safe(() => localStorage.setItem("nj-lat-" + cur.title, latency)); $("#lat").textContent = (latency >= 0 ? "+" : "") + Math.round(latency * 1000) + " ms"; applyBeat(); }
   async function loadTrack(title, url, getBuffer) {
     startBtn.disabled = true; tune.hidden = true; status.textContent = "Listening to the beat… 🎧";
     try {
       const ab = await getBuffer();
       const info = await analyse(ab);
       audio.src = url; audio.load();
-      cur = { title, duration: info.duration }; beat.bpm = info.bpm; beat.offset = info.offset;
+      cur = { title, duration: info.duration }; beat.bpm = info.bpm; beat.offset = info.offset; beat.beats = info.beats; beat.accents = info.accents || []; beat.down = info.down || 0; latency = parseFloat(safe(() => localStorage.getItem("nj-lat-" + title)) || "0") || 0; $("#lat").textContent = (latency >= 0 ? "+" : "") + Math.round(latency * 1000) + " ms"; base = { beats: info.beats.slice(), accents: (info.accents || []).map((a) => ({ ...a })) };
       bpmIn.value = info.bpm; reset_idle();
-      status.textContent = `Detected about ${info.bpm} BPM. If the platforms feel off-beat, tweak BPM or nudge the beat.`;
+      status.textContent = `Tracked ${info.beats.length} beats (about ${info.bpm} BPM). Press “Test beats” to hear clicks on the beat; if they feel early or late, nudge them.`;
       tune.hidden = false; startBtn.disabled = false; FX.toast("🎵 " + title + " ready!");
     } catch (e) {
       console.error(e); cur = null;
@@ -232,11 +247,28 @@
     const url = URL.createObjectURL(f); $("#track-list").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false"));
     loadTrack(f.name.replace(/\.[^.]+$/, ""), url, () => f.arrayBuffer());
   });
-  bpmIn.addEventListener("change", applyBeat);
-  $("#x2").addEventListener("click", () => { const v = parseFloat(bpmIn.value); bpmIn.value = v > 110 ? (v / 2).toFixed(1) : (v * 2).toFixed(1); applyBeat(); });
-  $("#off-").addEventListener("click", () => { beat.offset = Math.max(0, beat.offset - 0.06 * 60 / beat.bpm * 4); applyBeat(); FX.toast("Beat nudged earlier"); });
-  $("#off\\+").addEventListener("click", () => { beat.offset += 0.06 * 60 / beat.bpm * 4; applyBeat(); FX.toast("Beat nudged later"); });
-  startBtn.addEventListener("click", start);
+  bpmIn.addEventListener("change", rebuildGrid);
+  $("#x2").addEventListener("click", () => { const v = parseFloat(bpmIn.value); bpmIn.value = v > 110 ? (v / 2).toFixed(1) : (v * 2).toFixed(1); rebuildGrid(); });
+  $("#off-").addEventListener("click", () => { nudge(-20); FX.toast("Beats 20 ms earlier"); });
+  $("#off\\+").addEventListener("click", () => { nudge(20); FX.toast("Beats 20 ms later"); });
+  /* ---------- "Test beats": clicks on the tracked beats over the song, so you can hear whether it is in sync ---------- */
+  let testing = false, tAc = null, tNext = 0;
+  function stopTest() { testing = false; audio.pause(); $("#testbeat").textContent = "🔔 Test beats"; }
+  $("#testbeat").addEventListener("click", () => {
+    if (testing) { stopTest(); return; } if (!cur) return;
+    tAc = tAc || new (window.AudioContext || window.webkitAudioContext)(); tAc.resume();
+    audio.currentTime = Math.max(0, (beat.beats[Math.min(12, beat.beats.length - 1)] || 8) - 1); tNext = 0; audio.play().catch(() => {}); testing = true; $("#testbeat").textContent = "⏹ Stop test";
+    (function tick() {
+      if (!testing) return; const at = audio.currentTime;
+      for (let i = tNext; i < beat.beats.length; i++) {
+        const bt = beat.beats[i] + latency; if (bt < at - 0.02) { tNext = i + 1; continue; } if (bt > at + 0.12) break;
+        const o = tAc.createOscillator(), gn = tAc.createGain(); o.frequency.value = ((i - beat.down) % 4 === 0) ? 1500 : 1000; o.connect(gn); gn.connect(tAc.destination);
+        const when = tAc.currentTime + Math.max(0, bt - at); gn.gain.setValueAtTime(0.0001, when); gn.gain.exponentialRampToValueAtTime(0.35, when + 0.003); gn.gain.exponentialRampToValueAtTime(0.0001, when + 0.05); o.start(when); o.stop(when + 0.06); tNext = i + 1;
+      }
+      requestAnimationFrame(tick);
+    })();
+  });
+  startBtn.addEventListener("click", () => { if (testing) stopTest(); start(); });
   $("#again").addEventListener("click", start);
   $("#menu-btn").addEventListener("click", () => { audio.pause(); running = false; $("#result").classList.add("hidden"); $("#menu").classList.remove("hidden"); });
 })();

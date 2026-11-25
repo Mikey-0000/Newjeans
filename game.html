@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://mikey101101.github.io/Newjeans/assets/og.png" />
   <meta name="theme-color" content="#ff9ccf" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="styles.css?v=21" />
+  <link rel="stylesheet" href="styles.css?v=22" />
 </head>
 <body class="game-page" data-no-player data-no-cursor data-no-pet>
   <header class="hero">
@@ -46,8 +46,9 @@
           <p class="hint" id="analysis">Pick a song to analyse its beat. Your file never leaves your device.</p>
           <div class="tune" id="tune" hidden>
             <span>BPM <input id="bpm" type="number" min="60" max="200" step="0.1" aria-label="BPM" /></span>
-            <button class="jelly" id="off-" type="button">◀ beat</button>
-            <button class="jelly" id="off+" type="button">beat ▶</button>
+            <button class="jelly" id="testbeat" type="button" style="--jc:#dccaff">🔔 Test beats</button>
+            <button class="jelly" id="off-" type="button" aria-label="Move beats earlier">◀ earlier</button><span class="lat" id="lat" aria-live="polite">0 ms</span>
+            <button class="jelly" id="off+" type="button" aria-label="Move beats later">later ▶</button>
             <button class="jelly" id="x2" type="button">×2 / ÷2</button>
           </div>
           <button class="jelly big-btn" id="start" style="--jc:#d8f7ae" disabled>▶ Start</button>
@@ -69,7 +70,7 @@
   <script src="data.js"></script>
   <script src="fx.js?v=2"></script>
   <script src="extras.js?v=2"></script>
-  <script src="beat.js"></script>
-  <script src="game.js"></script>
+  <script src="beat.js?v=2"></script>
+  <script src="game.js?v=3"></script>
 </body>
 </html>
