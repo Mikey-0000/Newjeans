@@ -4,6 +4,16 @@
   const screen = $("#tv-screen"), list = $("#tv-list"), note = $("#tv-note");
   if (!screen) return;
   let blobUrl = null;
+  const box = $("#theatre"), exp = $("#tv-expand");
+  const setExp = (on) => {
+    box.classList.toggle("expanded", on); document.body.classList.toggle("tv-open", on);
+    exp.textContent = on ? "✕ Close" : "⛶ Expand"; exp.setAttribute("aria-expanded", on ? "true" : "false");
+    exp.setAttribute("aria-label", on ? "Shrink video" : "Expand video to full size");
+    if (on) { box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Music video theatre"); } else { box.removeAttribute("role"); }
+  };
+  exp.addEventListener("click", () => setExp(!box.classList.contains("expanded")));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && box.classList.contains("expanded")) setExp(false); });
+  screen.addEventListener("dblclick", () => setExp(!box.classList.contains("expanded")));
 
   const pauseMusic = () => { try { if (FX.audio && !FX.audio.paused) FX.audio.pause(); } catch (e) {} };
   const ytId = (u) => {

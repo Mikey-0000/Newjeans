@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#ff9ccf" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=11" />
 </head>
 <body class="home-page">
   <div id="floaters" aria-hidden="true"></div>
@@ -78,27 +78,29 @@
         </div>
         <p class="hint">Hint: click the logo letters, or the lightstick in the corner 👀</p>
       </section>
+
+      <section class="card theatre" id="theatre">
+        <div class="theatre-head">
+          <h2>🎬 Music video theatre</h2>
+          <button class="jelly tv-expand" id="tv-expand" type="button" style="--jc:#dccaff" aria-label="Expand video to full size" aria-expanded="false">⛶ Expand</button>
+        </div>
+        <div class="theatre-body">
+          <div class="tv jelly" style="--jc:#cfe9ff">
+            <div class="tv-screen" id="tv-screen"><div class="tv-empty"><span>📺</span><b>Nothing playing yet</b><small>Choose a video below</small></div></div>
+          </div>
+          <div class="tv-controls">
+            <div class="tv-list" id="tv-list" role="list"></div>
+            <form class="tv-paste" id="tv-form">
+              <input id="tv-url" type="text" inputmode="url" placeholder="Paste a YouTube link…" aria-label="YouTube link" />
+              <button class="jelly" type="submit" style="--jc:#ffb3dc">▶ Play</button>
+              <label class="jelly tv-file" style="--jc:#d8f7ae">📂 My file<input id="tv-file" type="file" accept="video/*" hidden></label>
+            </form>
+            <p class="hint" id="tv-note"></p>
+          </div>
+        </div>
+      </section>
     </aside>
   </main>
-
-  <section class="theatre-wrap" id="theatre">
-    <div class="theatre jelly" style="--jc:#fff">
-      <h2>🎬 Music video theatre</h2>
-      <p class="hint">Pick a video, paste a YouTube link, or play a video file from your own device.</p>
-      <div class="tv jelly" style="--jc:#cfe9ff">
-        <div class="tv-screen" id="tv-screen"><div class="tv-empty"><span>📺</span><b>Nothing playing yet</b><small>Choose a video below</small></div></div>
-      </div>
-      <div class="tv-controls">
-        <div class="tv-list" id="tv-list" role="list"></div>
-        <form class="tv-paste" id="tv-form">
-          <input id="tv-url" type="text" inputmode="url" placeholder="Paste a YouTube link…" aria-label="YouTube link" />
-          <button class="jelly" type="submit" style="--jc:#ffb3dc">▶ Play</button>
-          <label class="jelly tv-file" style="--jc:#d8f7ae">📂 My video file<input id="tv-file" type="file" accept="video/*" hidden></label>
-        </form>
-        <p class="hint" id="tv-note"></p>
-      </div>
-    </div>
-  </section>
 
   <footer class="credit-wrap">
     <button class="jelly credit" id="credit" type="button" aria-label="Made by Michael Dedeji, programmer and developer">
