@@ -2,7 +2,7 @@
 (function () {
   const { $, safe } = FX;
   const DISCS = [
-    { key: "ditto", title: "Ditto", img: "assets/cd-ditto.png?v=3", audio: ["music/ditto.m4a", "music/Ditto.m4a", "music/ditto.mp3"] },
+    { key: "ditto", title: "Ditto", img: "assets/cd-ditto.png?v=4", audio: ["music/ditto.m4a", "music/Ditto.m4a", "music/ditto.mp3"] },
     { key: "howsweet", title: "How Sweet", img: "assets/cd-howsweet.png?v=3", audio: ["music/how-sweet.mp3", "music/How Sweet.mp3", "music/How%20Sweet.mp3", "music/howsweet.mp3", "music/how-sweet.m4a", "music/How%20Sweet.m4a"] }
   ];
   const rack = $("#cd-rack"), ov = $("#cd-overlay"), au = $("#k-audio"), lines = $("#k-lines");
