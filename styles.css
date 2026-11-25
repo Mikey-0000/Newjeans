@@ -588,3 +588,9 @@ body.night .credit-text small { color: #27415a; }
 @keyframes wob { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) scale(1.08); } }
 .tv.jelly::after, .tv.jelly::before { display: none; }
 .tv-screen { z-index: 1; }
+
+/* cute hub over the CD centre hole */
+.cd-disc { position: relative; }
+.cd-disc::before { content: "🐰"; position: absolute; top: 65px; left: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; display: grid; place-items: center; font-size: 17px; line-height: 1; border-radius: 50%; z-index: 2; pointer-events: none;
+  background: radial-gradient(circle at 35% 28%, #fff 0 18%, #ffd6ec 48%, #ff9ccd 100%); box-shadow: inset 0 -3px 5px rgba(214,70,140,.35), inset 0 2px 3px rgba(255,255,255,.9), 0 2px 4px rgba(35,32,58,.3); border: 2px solid #fff; animation: hubBob 2.2s ease-in-out infinite; }
+@keyframes hubBob { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12) rotate(-6deg); } }
