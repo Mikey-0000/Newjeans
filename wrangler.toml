@@ -1,0 +1,4 @@
+# Used by `npx wrangler pages deploy` (direct upload). Git-connected Pages projects don't need this file.
+name = "newjeans"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-11-01"

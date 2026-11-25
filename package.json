@@ -1,0 +1,9 @@
+{
+  "name": "newjeans-fan-site",
+  "private": true,
+  "scripts": {
+    "build": "sh build.sh",
+    "preview": "npx wrangler pages dev dist",
+    "deploy": "sh build.sh && npx wrangler pages deploy dist"
+  }
+}
