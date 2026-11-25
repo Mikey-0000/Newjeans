@@ -614,3 +614,12 @@ body.tv-open .layout { z-index: 60; }
 .cd-disc, .cd-item { -webkit-tap-highlight-color: transparent; outline: none !important; }
 .cd-disc:focus, .cd-disc:focus-visible, .cd-disc:active, .cd-item:focus, .cd-item:focus-visible { outline: none !important; }
 .cd-disc:focus-visible img { filter: drop-shadow(0 0 8px #ff9ccd); }
+
+/* no thick outlines on any CD */
+.cd { border: 0 !important; box-shadow: 0 8px 14px rgba(35,32,58,.2), inset 0 0 0 5px rgba(255,255,255,.5) !important;
+  background: radial-gradient(circle, transparent 0 13%, rgba(255,255,255,.9) 13.5% 15.5%, transparent 16%), conic-gradient(from 20deg, #fff, var(--c), #fff, #ffd6f0, #fff, #bff0ff, #fff, var(--c), #fff) !important; }
+.cd-label { border: 0 !important; box-shadow: 0 0 0 3px rgba(255,255,255,.85); }
+.cd-item.active .cd { box-shadow: 0 8px 14px rgba(35,32,58,.2), 0 0 18px var(--c), inset 0 0 0 5px rgba(255,255,255,.5) !important; }
+.mini-cds .cd { border: 0 !important; box-shadow: 0 3px 6px rgba(35,32,58,.25) !important; }
+.k-disc { border: 0 !important; }
+.cd-item, .cd-item:focus, .cd-item:focus-visible, .cd-item:active, .cd-disc:focus, .cd-disc:active, button:focus:not(:focus-visible) { outline: none !important; }
