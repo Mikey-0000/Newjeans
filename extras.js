@@ -82,7 +82,9 @@
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || a.target === "_blank" || a.hasAttribute("download")) return;
     const u = new URL(a.href, location.href); if (u.origin !== location.origin || (u.pathname === location.pathname && u.hash) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     e.preventDefault(); set("nj-wipe", "1"); wipe.classList.add("go"); FX.whoosh();
-    setTimeout(() => (location.href = u.href), 420);
+    // navigate quickly; if anything goes wrong, clear the overlay so the page never gets stuck
+    setTimeout(() => { try { location.assign(u.href); } catch (err) { wipe.classList.remove("go"); } }, 320);
+    setTimeout(() => wipe.classList.remove("go"), 4000);
   });
   addEventListener("pageshow", (e) => { if (e.persisted) wipe.classList.remove("go"); });
 
