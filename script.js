@@ -171,8 +171,31 @@
     "hype boy": ["Hype Boy!! turn it up 🎵", "hyein"],
     eta: ["What's your ETA?", "haerin"]
   };
+
+  /* ---------- chat commands (/help, /dance, /boba ...) ---------- */
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const COMMANDS = {
+    help: async () => { await say("minji", "commands: /dance /boba /meow /alien /hug /music /night /ditto /roll /luck 💙", 700); await say("hanni", "try them all!! 🧋", 600); },
+    dance: async () => { FX.party && FX.party(); await say("danielle", "💃💃 dance break!! 💃💃", 600); await say("hyein", "*robot dance* beep boop 👽", 700); await say("hanni", "I can't stop, send help 😂", 700); await say("haerin", "...okay one spin. 🐱", 700); },
+    boba: async () => { FX.rain(["🧋", "🧋", "🫧", "💙"], 36); await say("hanni", "BOBA?! 🧋🧋🧋", 500); await say("danielle", "boba round!! who's paying 😂", 700); await say("haerin", "tapioca. yes.", 600); },
+    meow: async () => { await say("haerin", "meow.", 500); await say("hyein", "meow?? 🐱 omg she did it", 700); await say("minji", "haerin-ah 😭💙", 700); },
+    alien: async () => { FX.rain(["👽", "🛸", "✨"], 28); await say("hyein", "they have arrived 👽🛸", 500); await say("hanni", "tell them I want boba", 700); },
+    hug: async () => { FX.rain(["🫂", "💙", "🤍"], 30); for (const k of ["minji", "hanni", "danielle", "haerin", "hyein"]) await say(k, "*group hug* 🫂", 450); },
+    music: async () => { const a = FX.audio; if (a) { if (a.paused) a.play().catch(() => {}); else a.pause(); } await say("hyein", a && !a.paused ? "music on 🎵" : "music off 🔇", 500); },
+    night: async () => { const n = document.getElementById("st-night"); if (n) { n.checked = !n.checked; n.dispatchEvent(new Event("change")); } await say("haerin", FX.isNight() ? "night. good." : "day mode. too bright.", 600); },
+    ditto: async () => { FX.setTrack && FX.setTrack("ditto", true); await say("danielle", "Oh say it ditto :)", 600); await say("minji", "turning it up 🌙", 700); },
+    roll: async () => { const k = KEYS[Math.floor(Math.random() * KEYS.length)]; await say(k, "🎲 the dice picked me!! hehe", 700); FX.setTheme(k); },
+    luck: async () => { await say("minji", "today's luck is waiting in the Daily club 🌟 (check in for a fortune!)", 700); }
+  };
+  async function runCommand(text) {
+    const name = text.slice(1).trim().split(/\s+/)[0].toLowerCase(); const fn = COMMANDS[name];
+    addMessage({ me: true, text }); FX.pop(1.5); paused = true; busy = true;
+    if (fn) { FX.badge && FX.badge("chat"); await fn(); } else await say("minji", `hmm, I don't know /${name} — try /help 💙`, 700);
+    paused = false; busy = false;
+  }
   async function userSays(text) {
     text = text.trim(); if (!text) return;
+    if (text[0] === "/" && text.length > 1) { return runCommand(text); }
     addMessage({ me: true, text }); FX.pop(1.5); paused = true; busy = true;
     const nm = nameFromText(text);
     if (nm && !userName) {
@@ -206,6 +229,20 @@
     b.addEventListener("click", () => { FX.setTheme(k); openProfile(k); });
     $("#members").appendChild(b);
   });
+
+
+  /* ---------- member of the day ---------- */
+  {
+    const d = new Date().toLocaleDateString("en-CA"); let h = 11; for (const c of d) h = (h * 33 + c.charCodeAt(0)) >>> 0;
+    const k = KEYS[h % KEYS.length], m = M[k];
+    const HELLO = { minji: "good morning, bunnies!! I'm member of the day, so everyone be soft today 💙", hanni: "it's MY day!! member of the day = boba day 🧋", danielle: "hehe member of the day!! sunshine mode on ☀️", haerin: "...member of the day. okay. meow.", hyein: "member of the day?? the aliens chose well 👽" };
+    const tag = document.querySelector(".tagline");
+    if (tag) { const pill = document.createElement("a"); pill.className = "jelly motd"; pill.href = m.page; pill.style.setProperty("--jc", m.color); pill.innerHTML = `⭐ Member of the day: <b>${m.name}</b> ${m.emoji || ""}`; tag.insertAdjacentElement("afterend", pill); }
+    if (safe(() => localStorage.getItem("nj-motd")) !== d) {
+      safe(() => localStorage.setItem("nj-motd", d)); FX.setTheme(k, true);
+      setTimeout(() => { if (!busy) say(k, HELLO[k] || "member of the day!! 💙", 1000); FX.toast("⭐ " + m.name + " is member of the day!"); }, 2600);
+    }
+  }
 
   /* ---------- profile modal ---------- */
   const pOv = $("#profile-overlay");

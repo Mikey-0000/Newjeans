@@ -4,7 +4,7 @@
   const body = document.body;
   const get = (k, d) => { const v = safe(() => localStorage.getItem(k)); return v == null ? d : v; };
   const set = (k, v) => safe(() => localStorage.setItem(k, v));
-  const pages = [["index.html", "🏠 Home"], ["songs.html", "🎵 Song stories"], ["game.html", "🎮 Bunny Beat Jump"], ["concert.html", "🪄 Concert & lightstick"], ["photobooth.html", "📸 Photo booth"], ["wall.html", "💌 Fan wall"]];
+  const pages = [["index.html", "🏠 Home"], ["songs.html", "🎵 Song stories"], ["game.html", "🎮 Bunny Beat Jump"], ["concert.html", "🪄 Concert & lightstick"], ["photobooth.html", "📸 Photo booth"], ["wall.html", "💌 Fan wall"], ["daily.html", "🌟 Daily club"]];
 
   /* ---------- night mode ---------- */
   function applyNight(on) {
@@ -30,18 +30,55 @@
     <label class="st-row"><span>🪄 Lightstick cursor</span><input type="checkbox" id="st-cur" /></label>
     <label class="st-row"><span>🧘 Reduce motion</span><input type="checkbox" id="st-rm" /></label>
     <label class="st-row"><span>🔎 Larger text</span><input type="checkbox" id="st-big" /></label>
+    <button type="button" class="jelly st-install" id="st-install" hidden style="--jc:#d8f7ae">📲 Install as an app</button>
+    <p class="st-ios" id="st-ios" hidden>📲 To install: tap <b>Share</b> then <b>Add to Home Screen</b>.</p>
     <label class="st-row"><span>🔊 UI sounds</span><input type="range" id="st-vol" min="0" max="1" step="0.05" aria-label="UI sound volume" /></label>`;
   body.append(gear, panel);
   $("#st-cur").checked = FX.cursorOn ? FX.cursorOn() : false; $("#st-cur").disabled = !FX.setCursor;
   $("#st-cur").addEventListener("change", (e) => { FX.setCursor && FX.setCursor(e.target.checked); FX.toast(e.target.checked ? "🪄 Lightstick cursor on" : "Normal cursor"); });
   $("#st-night").checked = FX.isNight(); $("#st-vol").value = FX.vol;
-  $("#st-night").addEventListener("change", (e) => { applyNight(e.target.checked); FX.toast(e.target.checked ? "🌙 Night mode" : "☀️ Day mode"); FX.pop(e.target.checked ? 0.6 : 1.5); });
+  $("#st-night").addEventListener("change", (e) => { applyNight(e.target.checked); if (e.target.checked) FX.badge("night"); FX.toast(e.target.checked ? "🌙 Night mode" : "☀️ Day mode"); FX.pop(e.target.checked ? 0.6 : 1.5); });
   $("#st-vol").addEventListener("input", (e) => { FX.vol = parseFloat(e.target.value); set("nj-vol", FX.vol); FX.pop(1.2); });
-  const eggRow = document.createElement("div"); eggRow.className = "st-eggs"; eggRow.id = "st-eggs"; panel.appendChild(eggRow);
+  const eggRow = document.createElement("div"); eggRow.className = "st-eggs"; eggRow.id = "st-eggs"; panel.appendChild(eggRow); const bRow = document.createElement("div"); bRow.className = "st-badges"; bRow.id = "st-badges"; panel.appendChild(bRow);
   gear.addEventListener("click", () => { panel.hidden = !panel.hidden; gear.setAttribute("aria-expanded", String(!panel.hidden)); gear.textContent = panel.hidden ? "🐰" : "✕"; });
   document.addEventListener("pointerdown", (e) => { if (!panel.hidden && !panel.contains(e.target) && e.target !== gear) { panel.hidden = true; gear.textContent = "🐰"; gear.setAttribute("aria-expanded", "false"); } });
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) { panel.hidden = true; gear.textContent = "🐰"; } });
 
+
+
+  /* ---------- badges ---------- */
+  const BADGES = [
+    ["hello", "👋", "Hello bunny", "Visit the site"],
+    ["game", "🎮", "Beat jumper", "Finish a song in Bunny Beat Jump"],
+    ["legend", "🌟", "Bunny legend", "Collect 90% of the pearls in a song"],
+    ["synced", "🎤", "Lyric wizard", "Sync lyrics in the Lyric lab"],
+    ["sing", "🎙", "Studio bunny", "Record a sing-along"],
+    ["listener", "🎧", "Music lover", "Listen to 3 different songs"],
+    ["egg1", "🥚", "Egg hunter", "Find a secret"],
+    ["egg6", "🏆", "Master hunter", "Find every secret"],
+    ["booth", "📸", "Say cheese", "Save a photo from the Photo booth"],
+    ["wall", "💌", "Dear bunnies", "Post on the Fan wall"],
+    ["night", "🌙", "Night owl", "Switch on night mode"],
+    ["chat", "💬", "Chatterbox", "Use a chat command"],
+    ["streak3", "🔥", "On fire", "3-day check-in streak"],
+    ["streak7", "💎", "Week of bunnies", "7-day check-in streak"],
+    ["cards10", "🃏", "Card collector", "Collect 10 photo cards"],
+    ["cardsall", "👑", "Full binder", "Complete the photo-card binder"],
+    ["installed", "📲", "App bunny", "Install the site as an app"]
+  ];
+  FX.BADGES = BADGES;
+  const gotB = () => { try { return JSON.parse(get("nj-badges", "[]")); } catch (err) { return []; } };
+  FX.hasBadge = (id) => gotB().includes(id);
+  FX.badge = function (id) {
+    const b = BADGES.find((x) => x[0] === id); if (!b) return; const list = gotB(); if (list.includes(id)) return;
+    list.push(id); set("nj-badges", JSON.stringify(list)); FX.toast("🏅 Badge: " + b[1] + " " + b[2]); FX.pop(1.8, "triangle"); renderBadgeCount();
+    document.dispatchEvent(new CustomEvent("nj-badge", { detail: id }));
+  };
+  function renderBadgeCount() { const el = $("#st-badges"); if (el) el.innerHTML = `🏅 <a href="daily.html#badges">Badges: ${gotB().length}/${BADGES.length}</a>`; }
+  FX.badge("hello");
+  // sticker for CD hubs (unlocked by streaks on the Daily page)
+  { const hub = get("nj-hub", ""); if (hub) document.documentElement.style.setProperty("--hub", JSON.stringify(hub)); }
+  FX.setHub = (em) => { set("nj-hub", em); document.documentElement.style.setProperty("--hub", JSON.stringify(em || "🐰")); };
 
   /* ---------- accessibility: reduce motion, larger text, keyboard ---------- */
   const osRM = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -91,12 +128,12 @@
   }
   FX.egg = function (k) {
     const f = found(); if (f.includes(k)) return; const e = EGGS.find((x) => x[0] === k); if (!e) return;
-    f.push(k); set("nj-eggs", JSON.stringify(f)); renderEggs();
+    f.push(k); set("nj-eggs", JSON.stringify(f)); renderEggs(); FX.badge("egg1"); if (f.length === EGGS.length) FX.badge("egg6");
     FX.toast(e[1] + " Secret found: " + e[2] + " (" + f.length + "/" + EGGS.length + ")"); FX.pop(2, "triangle");
     if (!FX.reduced) FX.rain([e[1], "✨", "🥚"], 24);
     if (f.length === EGGS.length) setTimeout(() => { FX.toast("🏆 All secrets found! You're a true Bunny!"); FX.party && FX.party(); }, 1200);
   };
-  renderEggs();
+  renderEggs(); renderBadgeCount();
   // 2: type "ditto" outside text fields
   let typed = "";
   addEventListener("keydown", (e) => { if (e.target.matches && e.target.matches("input,textarea,select")) return; if (e.key.length === 1) { typed = (typed + e.key.toLowerCase()).slice(-5); if (typed === "ditto") FX.egg("ditto"); } });
@@ -154,6 +191,14 @@
     FX.pop(1.6, "triangle"); setTimeout(() => FX.pop(2, "triangle"), 160); setTimeout(() => FX.pop(2.4, "triangle"), 320);
   }
   FX.party = party;
+
+  /* ---------- install prompt ---------- */
+  { const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone; let dip = null;
+    const inst = $("#st-install"), ios = $("#st-ios");
+    if (!standalone && /iphone|ipad|ipod/i.test(navigator.userAgent)) ios.hidden = false;
+    addEventListener("beforeinstallprompt", (ev) => { ev.preventDefault(); dip = ev; if (!standalone) inst.hidden = false; });
+    inst.addEventListener("click", async () => { if (!dip) return; dip.prompt(); try { const r = await dip.userChoice; if (r.outcome === "accepted") { FX.toast("📲 Installed! Find the bunny on your home screen"); FX.badge && FX.badge("installed"); } } catch (e) {} dip = null; inst.hidden = true; });
+    addEventListener("appinstalled", () => { inst.hidden = true; FX.badge && FX.badge("installed"); }); }
 
   /* ---------- PWA ---------- */
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});

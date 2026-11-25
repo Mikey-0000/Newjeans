@@ -1,3 +1,6 @@
 [
-  { "title": "Hype Boy", "file": "music/Hype%20Boy.m4a", "emoji": "🐰", "color": "#a9e5ff" }
+  { "title": "Hype Boy", "file": "music/Hype%20Boy.m4a", "emoji": "🐰", "color": "#a9e5ff" },
+  { "title": "Ditto", "file": "music/ditto.m4a", "emoji": "🌙", "color": "#ffb3dc" },
+  { "title": "How Sweet", "file": "music/how-sweet.m4a", "emoji": "🍬", "color": "#ffd6f0" },
+  { "title": "Bubble Gum", "file": "music/bubble-gum.m4a", "emoji": "🫧", "color": "#d8f7ae" }
 ]

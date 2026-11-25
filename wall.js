@@ -16,7 +16,7 @@
     stage.appendChild(el);
   }
   SEED.concat(mine).forEach((m) => bubble(m));
-  $("#wf").addEventListener("submit", (e) => {
+  $("#wf").addEventListener("submit", (e) => { FX.badge && FX.badge("wall");
     e.preventDefault(); const t = $("#wmsg").value.trim(); if (!t) return;
     const m = { n: $("#wname").value.trim(), t, c: col }; mine.push(m); mine = mine.slice(-40); safe(() => localStorage.setItem("nj-wall", JSON.stringify(mine)));
     bubble(m, 0); $("#wmsg").value = ""; FX.pop(1.8, "triangle"); FX.rain(["🫧", "💙", "✨"], 10); FX.toast("Your note is floating up! 🫧");

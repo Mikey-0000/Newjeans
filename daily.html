@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Club · NewJeans Chat Archive</title>
+  <meta name="description" content="Daily bunny check-in: fortune, photo cards, badges and a countdown calendar." />
+  <link rel="icon" href="assets/bunny.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="canonical" href="https://mikey101101.github.io/Newjeans/daily.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="NewJeans Chat Archive" />
+  <meta property="og:title" content="Daily Club · NewJeans Chat Archive" />
+  <meta property="og:description" content="Daily bunny check-in: fortune, photo cards, badges and a countdown calendar." />
+  <meta property="og:url" content="https://mikey101101.github.io/Newjeans/daily.html" />
+  <meta property="og:image" content="https://mikey101101.github.io/Newjeans/assets/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="NewJeans Chat Archive with spinning CDs and the bunny" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Daily Club · NewJeans Chat Archive" />
+  <meta name="twitter:description" content="Daily bunny check-in: fortune, photo cards, badges and a countdown calendar." />
+  <meta name="twitter:image" content="https://mikey101101.github.io/Newjeans/assets/og.png" />
+  <meta name="theme-color" content="#ff9ccf" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css?v=21" />
+</head>
+<body class="wall-page daily-page">
+  <header class="hero">
+    <h1 class="logo" id="logo" aria-label="Daily Club"></h1>
+    <p class="tagline"><b>Check in</b> every day for a fortune, a photo card and a streak 🔥</p>
+  </header>
+  <main class="daily-shell">
+    <section class="card dcard" aria-labelledby="h-check">
+      <h2 id="h-check">🥠 Today's check-in</h2>
+      <div class="streak-row"><div class="streak" id="streak">🔥 0</div><small id="streak-sub">day streak</small><span class="tok" id="tok" title="Bonus pulls">🎟 0</span></div>
+      <div class="btn-row"><button class="jelly big-btn" id="checkin" type="button" style="--jc:var(--accent)">✨ Check in</button><button class="jelly" id="bonus" type="button" style="--jc:#fff4a8;padding:12px 18px;font-weight:700" hidden>🎟 Use bonus pull</button></div>
+      <div class="fortune jelly" id="fortune" style="--jc:#fff" hidden></div>
+      <div class="pull-stage" id="pull" aria-live="polite"></div>
+    </section>
+
+    <section class="card dcard" aria-labelledby="h-binder">
+      <h2 id="h-binder">🃏 Photo-card binder <small id="binder-count"></small></h2>
+      <div class="binder" id="binder"></div>
+      <p class="hint">Pull one card a day. Hit a 7-day streak for a bonus pull. Cards are saved on this device.</p>
+    </section>
+
+    <section class="card dcard" aria-labelledby="h-sticker">
+      <h2 id="h-sticker">🎀 CD sticker box</h2>
+      <p class="hint">Streaks unlock stickers for the little button on every CD. Pick one!</p>
+      <div class="stickers" id="stickers" role="radiogroup" aria-label="CD sticker"></div>
+    </section>
+
+    <section class="card dcard" id="badges" aria-labelledby="h-badges">
+      <h2 id="h-badges">🏅 Trophy shelf <small id="badge-count"></small></h2>
+      <div class="trophies" id="trophies"></div>
+    </section>
+
+    <section class="card dcard" aria-labelledby="h-cal">
+      <h2 id="h-cal">📅 Countdown calendar</h2>
+      <div class="next-up jelly" id="nextup" style="--jc:#d8f7ae"></div>
+      <div class="cal-list" id="cal"></div>
+      <form class="cal-form" id="cal-form" autocomplete="off">
+        <input id="ev-name" maxlength="30" placeholder="Add your own date (name)" aria-label="Event name" required />
+        <input id="ev-date" type="date" aria-label="Event date" required />
+        <label class="yr"><input id="ev-yr" type="checkbox" checked /> every year</label>
+        <button class="jelly" type="submit" style="--jc:#ffb3dc;padding:8px 16px;font-weight:700">➕ Add</button>
+      </form>
+    </section>
+    <a class="jelly back-link" href="index.html" style="justify-self:start">← Back to home</a>
+  </main>
+  <script src="data.js"></script>
+  <script src="fx.js?v=2"></script>
+  <script src="extras.js?v=2"></script>
+  <script src="daily.js"></script>
+</body>
+</html>

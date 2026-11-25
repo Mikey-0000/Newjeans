@@ -66,6 +66,9 @@
     $("#res-title").textContent = win ? (pct > 80 ? "💙 Bunny legend!" : "🎉 Song complete!") : "😵 Out of hearts!";
     $("#res-body").innerHTML = `Score <b>${score}</b>${nb ? " — <b>new best!</b>" : ` (best ${prev})`}<br>Pearls ${pearlsGot}/${pearlsTotal} (${pct}%) · Perfect landings ${perfects} · Best combo ${maxCombo}`;
     $("#result").classList.remove("hidden"); if (win) FX.rain(["💙", "🧋", "⭐"], 26);
+    safe(() => { const k2 = "nj-bjp-" + cur.title, pp = parseInt(localStorage.getItem(k2) || "0", 10) || 0; if (pct > pp) localStorage.setItem(k2, pct); });
+    if (win && FX.badge) { FX.badge("game"); if (pct >= 90) FX.badge("legend"); }
+    renderBoard();
   }
   audio.addEventListener("ended", () => finish(true));
 
@@ -208,6 +211,11 @@
       status.textContent = "Couldn't read that audio here. If you opened this from a file:// link, run it through GitHub Pages or a local server, or try an mp3/m4a.";
     }
   }
+  function renderBoard() {
+    const box = $("#board"); if (!box) return;
+    const rows = tracks.map((tr) => { const s = parseInt(safe(() => localStorage.getItem("nj-bj-" + tr.title)) || "0", 10) || 0, p = parseInt(safe(() => localStorage.getItem("nj-bjp-" + tr.title)) || "0", 10) || 0; return { tr, s, p }; });
+    box.innerHTML = "<h3>🏆 Best scores</h3>" + rows.map((r) => `<div class="board-row"><span>${r.tr.emoji || "🎵"} ${r.tr.title}</span><b>${r.s ? r.s.toLocaleString() : "—"}</b><small>${r.s ? r.p + "% pearls" : "not played yet"}</small></div>`).join("");
+  }
   function renderTracks() {
     const box = $("#track-list"); box.innerHTML = "";
     tracks.forEach((tr, i) => {
@@ -217,7 +225,7 @@
       box.appendChild(b); if (i === 0) setTimeout(() => b.click(), 50);
     });
   }
-  fetch("music/tracks.json").then((r) => r.json()).catch(() => [{ title: "Hype Boy", file: "music/Hype%20Boy.m4a", emoji: "🐰", color: "#a9e5ff" }]).then((l) => { tracks = l; renderTracks(); });
+  fetch("music/tracks.json").then((r) => r.json()).catch(() => [{ title: "Hype Boy", file: "music/Hype%20Boy.m4a", emoji: "🐰", color: "#a9e5ff" }]).then((l) => { tracks = l; renderTracks(); renderBoard(); });
 
   $("#file").addEventListener("change", (e) => {
     const f = e.target.files[0]; if (!f) return;

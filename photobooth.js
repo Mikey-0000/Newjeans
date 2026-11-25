@@ -84,7 +84,7 @@
   cv.addEventListener("pointerup", () => (drag = null));
   $("#bsave").addEventListener("click", () => {
     const keep = sel; sel = -1; draw();
-    cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "bunny-photo.png"; a.click(); FX.toast("⬇ Saved!"); FX.rain(["📸", "✨", "💙"], 14); sel = keep; draw(); });
+    cv.toBlob((b) => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "bunny-photo.png"; a.click(); FX.toast("⬇ Saved!"); FX.badge && FX.badge("booth"); FX.rain(["📸", "✨", "💙"], 14); sel = keep; draw(); });
   });
   draw(); load("images/hyein.jpg");
 })();

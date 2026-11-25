@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://mikey101101.github.io/Newjeans/assets/og.png" />
   <meta name="theme-color" content="#ff9ccf" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="styles.css?v=18" />
+  <link rel="stylesheet" href="styles.css?v=21" />
 </head>
 <body class="home-page">
   <div id="floaters" aria-hidden="true"></div>
@@ -53,6 +53,7 @@
         <button class="jelly" data-say="boba?? 🧋">🧋 boba?</button>
         <button class="jelly" data-say="Hype Boy is a bop">🎵 Hype Boy</button>
         <button class="jelly" data-say="meow">🐱 meow</button>
+        <button class="jelly" data-say="/help">⌨️ /help</button>
         <button class="jelly" data-say="I love you bunnies 💙">💙 love</button>
         <button class="jelly" data-say="Ditto!">🌙 Ditto</button>
       </div>
@@ -110,6 +111,7 @@
           <a class="jelly" href="concert.html" style="--jc:#dccaff">🪄 Concert</a>
           <a class="jelly" href="photobooth.html" style="--jc:#fff4a8">📸 Photo booth</a>
           <a class="jelly" href="wall.html" style="--jc:#ffd6e7">💌 Fan wall</a>
+          <a class="jelly" href="daily.html" style="--jc:#fff4a8">🌟 Daily club</a>
           <button class="jelly" id="rain-btn" style="--jc:#bfe6ff">🌧️ Bunny rain</button>
           <button class="jelly" id="shuffle-btn" style="--jc:#fff4a8">🫧 Shake bubbles</button>
         </div>
@@ -169,11 +171,24 @@
         <textarea id="k-text" rows="6" placeholder="Paste lyrics here, one line per row…" aria-label="Lyrics text"></textarea>
         <div class="btn-row">
           <button class="jelly" id="k-sync" type="button" style="--jc:#d8f7ae;padding:8px 14px;font-weight:700">⏱ Start syncing</button>
+          <button class="jelly" id="k-auto" type="button" style="--jc:#dccaff;padding:8px 14px;font-weight:700" title="Estimate line start times from the audio">✨ Auto-sync</button>
           <button class="jelly" id="k-tap" type="button" style="--jc:var(--accent);padding:8px 14px;font-weight:700" disabled>Next line ⏎</button>
           <button class="jelly" id="k-export" type="button" style="--jc:#fff;padding:8px 14px;font-weight:700">⬇ Export .lrc</button>
           <label class="jelly" style="--jc:#fff;padding:8px 14px;font-weight:700;display:inline-block;cursor:pointer">📂 Load .lrc<input type="file" id="k-file" accept=".lrc,.txt" hidden /></label>
           <button class="jelly" id="k-clear" type="button" style="--jc:#fff;padding:8px 14px;font-weight:700">🗑 Clear</button>
         </div>
+      </div>
+      <div class="k-nudge" id="k-nudgebox" hidden><p class="hint"><b>Fine-tune:</b> auto-sync is an estimate. Use −/+ to nudge a line by 0.1s, or ▶ to hear it.</p><div id="k-nudge"></div></div>
+      <div class="k-rec" id="k-rec">
+        <div class="btn-row">
+          <button class="jelly" id="k-inst" type="button" style="--jc:#d8f7ae;padding:8px 14px;font-weight:700" hidden>🎹 Instrumental: off</button>
+          <button class="jelly" id="k-recbtn" type="button" style="--jc:#ffb3dc;padding:8px 14px;font-weight:700">🎙 Record my singing</button>
+        </div>
+        <div class="k-recout" id="k-recout" hidden>
+          <audio id="k-recplay" controls></audio>
+          <a class="jelly" id="k-recdl" download="my-sing-along" style="--jc:#fff4a8;padding:8px 14px;font-weight:700;display:inline-block">⬇ Download</a>
+        </div>
+        <p class="hint" id="k-rechint">Wear headphones so the song doesn't leak into the mic. Recordings stay on your device.</p>
       </div>
       <audio id="k-audio" preload="auto"></audio>
     </div>
@@ -195,8 +210,8 @@
   <script src="fx.js?v=2"></script>
   <script src="extras.js?v=2"></script>
   <script src="profile.js"></script>
-  <script src="script.js?v=2"></script>
-  <script src="cdplayer.js?v=4"></script>
+  <script src="script.js?v=3"></script>
+  <script src="cdplayer.js?v=5"></script>
   <script src="theatre.js?v=2"></script>
 </body>
 </html>

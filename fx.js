@@ -164,7 +164,10 @@
   const TRACKS = [
     { key: "hypeboy", title: "Hype Boy", emoji: "🐰", img: "assets/cd-debut.png", files: ["music/Hype%20Boy.m4a"] },
     { key: "ditto", title: "Ditto", emoji: "🌙", img: "assets/cd-ditto.png", files: ["music/ditto.m4a", "music/Ditto.m4a", "music/ditto.mp3", "music/Ditto.mp3"] },
-    { key: "howsweet", title: "How Sweet", emoji: "🍬", img: "assets/cd-howsweet.png", files: ["music/how-sweet.m4a", "music/how-sweet.mp3", "music/How%20Sweet.m4a", "music/How%20Sweet.mp3"] }
+    { key: "howsweet", title: "How Sweet", emoji: "🍬", img: "assets/cd-howsweet.png", files: ["music/how-sweet.m4a", "music/how-sweet.mp3"] },
+    { key: "bubblegum", title: "Bubble Gum", emoji: "🫧", img: "assets/cd-howsweet.png", files: ["music/bubble-gum.m4a", "music/bubble-gum.mp3"] },
+    { key: "howsweet-inst", title: "How Sweet (Inst.)", emoji: "🎹", img: "assets/cd-howsweet.png", files: ["music/how-sweet-instrumental.m4a"] },
+    { key: "bubblegum-inst", title: "Bubble Gum (Inst.)", emoji: "🎹", img: "assets/cd-howsweet.png", files: ["music/bubble-gum-instrumental.m4a"] }
   ];
   FX.TRACKS = TRACKS;
   function buildPlayer() {
@@ -179,7 +182,7 @@
         <span class="bars" aria-hidden="true">${"<i></i>".repeat(6)}</span>
       </div>
       <div class="mp-menu" id="mp-menu" role="listbox" aria-label="Tracks" hidden></div>
-      <div class="mp-mid"><div class="progress" id="mp-prog" role="slider" aria-label="Seek" tabindex="0"><i></i></div><button class="mute" id="mp-mute" aria-label="Mute sound effects" title="Sound effects on/off">${muted ? "🔇" : "🔊"}</button></div>
+      <div class="mp-mid"><div class="progress" id="mp-prog" role="slider" aria-label="Seek" tabindex="0"><i></i></div><button class="mute" id="mp-sleep" aria-label="Sleep timer: off" title="Sleep timer">💤</button><button class="mute" id="mp-mute" aria-label="Mute sound effects" title="Sound effects on/off">${muted ? "🔇" : "🔊"}</button></div>
       <div class="mp-status" id="mp-status" role="status" aria-live="polite">Press ▶ to play music</div>
       <audio id="bg-music" preload="metadata"></audio>`;
     document.body.appendChild(mp);
@@ -221,11 +224,27 @@
       if (fileI < t.files.length - 1) { fileI++; au.src = t.files[fileI]; au.load(); if (safe(() => sessionStorage.getItem("nj-play")) === "1") au.play().catch(() => {}); }
       else status.textContent = "No audio found for " + t.title + " — add " + t.files[0].replace(/%20/g, " ");
     });
-    au.addEventListener("timeupdate", () => { if (au.duration) $("i", prog).style.width = (au.currentTime / au.duration) * 100 + "%"; });
+    au.addEventListener("timeupdate", () => { if (au.currentTime > 30 && FX.badge) { const k = TRACKS[idx].key; const h = JSON.parse(safe(() => localStorage.getItem("nj-heard")) || "[]"); if (!h.includes(k)) { h.push(k); safe(() => localStorage.setItem("nj-heard", JSON.stringify(h))); if (h.length >= 3) FX.badge("listener"); } } if (au.duration) $("i", prog).style.width = (au.currentTime / au.duration) * 100 + "%"; });
     const seek = (e) => { const r = prog.getBoundingClientRect(); if (au.duration) au.currentTime = ((e.clientX - r.left) / r.width) * au.duration; };
     prog.addEventListener("click", seek);
     prog.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") au.currentTime += 5; if (e.key === "ArrowLeft") au.currentTime -= 5; });
     $("#mp-mute").addEventListener("click", (e) => { FX.setMuted(!muted); e.currentTarget.textContent = muted ? "🔇" : "🔊"; FX.toast(muted ? "Sound effects off" : "Sound effects on"); });
+
+    // sleep timer: off -> 15 -> 30 -> 60 minutes, fades the music out at the end
+    const sleepBtn = $("#mp-sleep"), steps = [0, 15, 30, 60]; let sleepI = 0, sleepEnd = 0, sleepT = null;
+    const sleepTick = () => {
+      const left = sleepEnd - Date.now();
+      if (left <= 0) { au.pause(); au.volume = 1; sleepI = 0; sleepEnd = 0; clearInterval(sleepT); sleepBtn.textContent = "💤"; sleepBtn.setAttribute("aria-label", "Sleep timer: off"); status.textContent = "💤 Sleep timer finished — sweet dreams"; FX.toast("💤 Music faded out. Sweet dreams!"); return; }
+      au.volume = left < 10000 ? Math.max(0, left / 10000) : 1;
+      sleepBtn.textContent = "💤" + Math.ceil(left / 60000);
+    };
+    sleepBtn.addEventListener("click", () => {
+      sleepI = (sleepI + 1) % steps.length; clearInterval(sleepT); au.volume = 1;
+      if (!steps[sleepI]) { sleepEnd = 0; sleepBtn.textContent = "💤"; sleepBtn.setAttribute("aria-label", "Sleep timer: off"); FX.toast("Sleep timer off"); return; }
+      sleepEnd = Date.now() + steps[sleepI] * 60000; sleepBtn.setAttribute("aria-label", "Sleep timer: " + steps[sleepI] + " minutes"); sleepTick(); sleepT = setInterval(sleepTick, 500);
+      FX.toast("💤 Music will fade out in " + steps[sleepI] + " min");
+    });
+    FX.sleepTest = (ms) => { sleepEnd = Date.now() + ms; clearInterval(sleepT); sleepT = setInterval(sleepTick, 100); };
 
     // remember the track and carry the song across pages
     const savedKey = safe(() => sessionStorage.getItem("nj-track")); const startI = Math.max(0, TRACKS.findIndex((t) => t.key === savedKey));
