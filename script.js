@@ -353,4 +353,10 @@
     $("#g-msg-text").textContent = `${newBest ? "🎉 New best! " : ""}You scored ${score}. ${score > 25 ? "Boba legend!" : score > 12 ? "Nice pops!" : "Try again!"}`;
     $("#g-start").textContent = "Play again"; gMsg.classList.remove("hidden");
   }
+
+  /* ---------- credit badge ---------- */
+  const credit = $("#credit");
+  if (credit) credit.addEventListener("click", (e) => {
+    FX.burst(e.clientX, e.clientY, 12, ["💙", "✨", "⭐", "🫧", "🐰"]); FX.pop(1.7, "triangle"); FX.toast("💙 Made with love by Michael Dedeji");
+  });
 })();

@@ -519,3 +519,23 @@ body.night .back-link { --jc: #dccaff; }
 @media (max-width: 760px) { .wall-form { grid-template-columns: 1fr; } }
 .tagline b { color: var(--ink); }
 [hidden] { display: none !important; }
+
+/* ============ creator badge ============ */
+.layout { padding-bottom: 10px; }
+.credit-wrap { position: relative; z-index: 3; display: flex; justify-content: center; padding: 18px 16px 150px; }
+.credit {
+  --jc: #a9e5ff; display: flex; align-items: center; gap: 14px; padding: 12px 28px 12px 14px; border-radius: 999px; text-align: left; overflow: visible;
+  background: linear-gradient(180deg, #fff 0%, #cfeeff 35%, #8fd4ff 100%);
+  animation: creditFloat 4s ease-in-out infinite;
+}
+@keyframes creditFloat { 0%,100% { transform: translateY(0) rotate(-.6deg); } 50% { transform: translateY(-6px) rotate(.6deg); } }
+.credit:hover { animation-play-state: paused; }
+.credit-avatar { flex: 0 0 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; background: radial-gradient(circle at 30% 25%, #fff, #ffd6e7 60%, #ff9ccf); border: 3px solid var(--ink); box-shadow: 0 3px 0 var(--ink); }
+.credit-text { display: grid; line-height: 1.15; position: relative; z-index: 1; }
+.credit-text small { font-weight: 600; font-size: 12px; color: #3a5a78; }
+.credit-text b { font-family: "Baloo 2", var(--font); font-size: 1.45rem; font-weight: 800; color: #fff; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 0 3px 0 var(--ink); }
+.credit-text span { font-weight: 600; font-size: 14px; }
+.credit-spark { position: absolute; font-size: 20px; pointer-events: none; animation: twinkle 2.4s ease-in-out infinite; }
+.credit-spark.s1 { right: 10px; top: -10px; } .credit-spark.s2 { left: -8px; bottom: -6px; animation-delay: .8s; } .credit-spark.s3 { right: -10px; bottom: 6px; animation-delay: 1.4s; }
+body.night .credit-text small { color: #27415a; }
+@media (max-width: 640px) { .credit { padding: 10px 20px 10px 10px; gap: 10px; } .credit-text b { font-size: 1.2rem; } .credit-text span { font-size: 12.5px; } .credit-avatar { flex-basis: 44px; height: 44px; font-size: 22px; } }
