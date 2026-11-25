@@ -481,9 +481,6 @@ body.night .back-link { --jc: #dccaff; }
 .st-row input[type=range] { width: 120px; accent-color: var(--accent-dark); }
 .st-btn { padding: 9px 14px; font-weight: 700; font-size: 15px; --jc: #d8f7ae; }
 
-.pet { position: fixed; left: 0; top: 0; width: 50px; z-index: 9000; cursor: pointer; filter: drop-shadow(0 4px 3px rgba(35,32,58,.25)); user-select: none; -webkit-user-drag: none; }
-body.has-cursor .pet { cursor: none !important; }
-.boba-drop { position: fixed; z-index: 8999; font-size: 34px; pointer-events: none; }
 
 .wipe { position: fixed; inset: 0; z-index: 99997; pointer-events: none; }
 .wipe i { position: fixed; left: 50%; top: 50%; width: 40px; height: 40px; translate: -50% -50%; border-radius: 50%; background: var(--accent); border: 5px solid var(--ink); scale: 0; }
