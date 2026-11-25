@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "sh build.sh",
-    "preview": "npx wrangler pages dev dist",
-    "deploy": "sh build.sh && npx wrangler pages deploy dist"
+    "preview": "npx wrangler dev",
+    "deploy": "sh build.sh && npx wrangler deploy"
   }
 }
