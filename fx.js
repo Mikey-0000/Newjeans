@@ -140,7 +140,7 @@
   /* ---------- global click: burst + wobble ---------- */
   function buildClicks() {
     addEventListener("pointerdown", (e) => {
-      const jel = e.target.closest && e.target.closest(".jelly:not(.floater):not(.overlay):not(.card):not(.music-player)");
+      const jel = e.target.closest && e.target.closest(".jelly:not(.floater):not(.overlay):not(.card):not(.music-player):not(.play-btn):not(.member-btn)");
       if (jel && jel.tagName !== "INPUT") { FX.squish(jel); }
       if (e.target.closest && e.target.closest("button, a, .bubble, .floater, .avatar")) FX.pop(0.8 + Math.random() * 0.8);
       FX.burst(e.clientX, e.clientY, e.target.closest && e.target.closest(".fall") ? 0 : 6);
@@ -167,9 +167,12 @@
       if (playing) barT = setInterval(() => bars.forEach((b) => (b.style.height = rand(4, 22) + "px")), 130);
       else bars.forEach((b) => (b.style.height = "4px"));
     };
-    btn.addEventListener("click", () => {
+    const toggle = () => {
       if (au.paused) au.play().catch(() => (status.textContent = "Couldn't play — check music/Hype Boy.m4a")); else au.pause();
-    });
+    };
+    // pointerdown so the press animation can never swallow the click; click only for keyboard
+    btn.addEventListener("pointerdown", (e) => { e.preventDefault(); toggle(); });
+    btn.addEventListener("click", (e) => { if (e.detail === 0) toggle(); });
     au.addEventListener("play", () => { setUI(true); safe(() => sessionStorage.setItem("nj-play", "1")); });
     au.addEventListener("pause", () => { setUI(false); safe(() => sessionStorage.setItem("nj-play", "0")); });
     au.addEventListener("error", () => (status.textContent = "Audio could not load. Check music/Hype Boy.m4a"), true);
