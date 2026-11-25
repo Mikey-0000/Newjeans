@@ -1,0 +1,272 @@
+/* Bunny Beat Jump — a rhythm platformer. Beat is detected in the browser from any audio file. */
+(function () {
+  const { $, rand, safe } = FX;
+  const cv = $("#cv"), g = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const audio = $("#song");
+  const bunny = new Image(); bunny.src = "assets/bunny.png";
+
+  /* ---------- wobbly title ---------- */
+  const logo = $("#logo");
+  const mk = (txt, parent) => [...txt].forEach((c) => { const s = document.createElement("span"); if (c === " ") s.className = "sp"; else { s.className = "ch"; s.textContent = c; } parent.appendChild(s); });
+  mk("Bunny Beat", logo); const sub = document.createElement("span"); sub.className = "sub"; mk("Jump", sub); logo.appendChild(sub);
+  logo.addEventListener("pointerover", (e) => { const c = e.target.closest(".ch"); if (c) FX.squish(c); });
+
+  /* ---------- beat analysis ---------- */
+  async function analyse(arrayBuffer) {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = await ac.decodeAudioData(arrayBuffer);
+    ac.close && ac.close();
+    const sr = buf.sampleRate, a = buf.getChannelData(0), b = buf.numberOfChannels > 1 ? buf.getChannelData(1) : a;
+    const hop = Math.floor(sr / 100), n = Math.floor(a.length / hop);
+    const full = new Float32Array(n), low = new Float32Array(n);
+    let lp = 0;
+    for (let i = 0; i < n; i++) {
+      let ef = 0, el = 0;
+      for (let j = i * hop; j < (i + 1) * hop; j++) {
+        const x = (a[j] + b[j]) * 0.5; lp += 0.03 * (x - lp);
+        ef += x * x; el += lp * lp;
+      }
+      full[i] = Math.log(1 + 30 * Math.sqrt(ef / hop)); low[i] = Math.log(1 + 60 * Math.sqrt(el / hop));
+    }
+    const flux = new Float32Array(n);
+    for (let i = 1; i < n; i++) flux[i] = Math.max(0, full[i] - full[i - 1]) + 1.5 * Math.max(0, low[i] - low[i - 1]);
+    // subtract local average
+    const env = new Float32Array(n), win = 50; let sum = 0;
+    for (let i = 0; i < n; i++) { sum += flux[i]; if (i >= 2 * win) sum -= flux[i - 2 * win]; const m = sum / Math.min(i + 1, 2 * win); env[i] = Math.max(0, flux[i] - m); }
+    const scoreFor = (bpm) => {
+      const p = 6000 / bpm; let best = 0, bp = 0;
+      for (let ph = 0; ph < p; ph += 0.5) {
+        let s = 0, c = 0; for (let t = ph; t < n - 1; t += p) { s += env[Math.round(t)]; c++; }
+        s /= c; if (s > best) { best = s; bp = ph; }
+      }
+      return [best, bp];
+    };
+    let top = [0, 100, 0];
+    for (let bpm = 70; bpm <= 170; bpm += 0.25) {
+      const [s, ph] = scoreFor(bpm); const prior = Math.exp(-Math.pow(Math.log2(bpm / 112), 2) / 0.55);
+      const v = s * (0.6 + 0.4 * prior); if (v > top[0]) top = [v, bpm, ph];
+    }
+    let best = top;
+    for (let bpm = top[1] - 0.4; bpm <= top[1] + 0.4; bpm += 0.02) { const [s, ph] = scoreFor(bpm); if (s > best[0] * 0.98 && s >= best[0] - 1e-9) best = [s, bpm, ph]; }
+    return { bpm: Math.round(best[1] * 10) / 10, offset: best[2] / 100, duration: buf.duration };
+  }
+
+  /* ---------- state ---------- */
+  const V = 330;            // world speed px/s
+  const PX = 230;           // player screen x
+  const BASE_Y = 430, LANE = 52;
+  let tracks = [], cur = null, beat = { bpm: 100, offset: 0 }, level = null;
+  let running = false, over = false, t = 0, lastA = 0, lastP = 0;
+  let P, score, combo, maxCombo, hearts, perfects, pearlsGot, pearlsTotal, floaters = [], parts = [];
+
+  /* ---------- level from beat grid ---------- */
+  function buildLevel(dur) {
+    const p = 60 / beat.bpm, m = beat.bpm > 135 ? 4 : 2, u = m * p;
+    const plats = [], pearls = [];
+    let lane = 0, seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    plats.push({ ts: -6, te: beat.offset + 0.5 * p - 0.25 * p + 1.5 * u * 0 + 0.0, lane: 0, col: 0 }); // starting runway
+    plats[0].te = beat.offset - 0.25 * p + 0.75 * u;
+    let i = 0;
+    for (let ts = beat.offset - 0.25 * p + u; ts < dur + 1; ts += u, i++) {
+      const r = rnd(); lane = Math.max(0, Math.min(3, lane + (r < 0.33 ? -1 : r < 0.66 ? 0 : 1)));
+      const pl = { ts, te: ts + 0.75 * u, lane, col: (i % 5) };
+      plats.push(pl);
+      // pearls on beats inside platform
+      for (let tb = Math.ceil((pl.ts + 0.05 - beat.offset) / p) * p + beat.offset; tb < pl.te; tb += p) {
+        const idx = Math.round((tb - beat.offset) / p), star = idx % 8 === 0;
+        pearls.push({ t: tb, y: BASE_Y - lane * LANE - (star ? 150 : 95), star, got: false, miss: false });
+      }
+    }
+    return { plats, pearls, p, u, dur };
+  }
+  const platTop = (pl) => BASE_Y - pl.lane * LANE;
+  const platAt = (time, ytop) => level.plats.find((pl) => pl.ts <= time && pl.te >= time);
+
+  /* ---------- game flow ---------- */
+  function reset() {
+    level = buildLevel(cur.duration);
+    score = combo = maxCombo = perfects = pearlsGot = 0; hearts = 3; pearlsTotal = level.pearls.length;
+    floaters = []; parts = [];
+    P = { y: BASE_Y, vy: 0, ground: true, jumps: 0, sq: 1, hover: false, inv: 0 };
+    over = false; t = 0;
+  }
+  function start() {
+    reset(); $("#menu").classList.add("hidden"); $("#result").classList.add("hidden");
+    audio.currentTime = 0; audio.play().then(() => { running = true; lastP = performance.now(); lastA = 0; }).catch(() => FX.toast("Tap again to start the music"));
+    running = true; lastP = performance.now(); lastA = 0;
+  }
+  function finish(win) {
+    if (over) return; over = true; running = false; audio.pause();
+    const key = "nj-bj-" + cur.title, prev = parseInt(safe(() => localStorage.getItem(key)) || "0", 10) || 0;
+    const nb = score > prev; if (nb) safe(() => localStorage.setItem(key, score));
+    const pct = pearlsTotal ? Math.round((pearlsGot / pearlsTotal) * 100) : 0;
+    $("#res-title").textContent = win ? (pct > 80 ? "💙 Bunny legend!" : "🎉 Song complete!") : "😵 Out of hearts!";
+    $("#res-body").innerHTML = `Score <b>${score}</b>${nb ? " — <b>new best!</b>" : ` (best ${prev})`}<br>Pearls ${pearlsGot}/${pearlsTotal} (${pct}%) · Perfect landings ${perfects} · Best combo ${maxCombo}`;
+    $("#result").classList.remove("hidden"); if (win) FX.rain(["💙", "🧋", "⭐"], 26);
+  }
+  audio.addEventListener("ended", () => finish(true));
+
+  function jump() {
+    if (!running) return;
+    if (P.hover) return;
+    if (P.ground) { P.vy = -780; P.ground = false; P.jumps = 1; P.sq = 1.35; FX.pop(1.4, "triangle", .09); }
+    else if (P.jumps < 2) { P.vy = -700; P.jumps = 2; P.sq = 1.3; FX.pop(1.8, "triangle", .09); burst(PX, P.y, 5, "#fff"); }
+  }
+  addEventListener("keydown", (e) => { if (["Space", "ArrowUp", "KeyW"].includes(e.code)) { e.preventDefault(); if (!e.repeat) jump(); } });
+  cv.addEventListener("pointerdown", (e) => { e.preventDefault(); jump(); });
+
+  function burst(x, y, n, col) { for (let i = 0; i < n; i++) parts.push({ x, y, vx: rand(-160, 160), vy: rand(-240, -20), l: 1, c: col || "#fff" }); }
+  function say(text, x, y, col) { floaters.push({ text, x, y, l: 1, col: col || "#23203a" }); }
+
+  /* ---------- update ---------- */
+  function update(dt) {
+    // clock: audio time, smoothed
+    const at = audio.currentTime; const now = performance.now();
+    if (at !== lastA) { lastA = at; lastP = now; }
+    t = at + (audio.paused ? 0 : Math.min(0.05, (now - lastP) / 1000));
+    const p = level.p;
+    // physics
+    const pl = platAt(t);
+    const top = pl ? platTop(pl) : null;
+    if (P.hover) {
+      const next = level.plats.find((q) => q.te >= t && q.ts <= t + 0.2) || level.plats.find((q) => q.ts > t);
+      const tgt = next ? platTop(next) - 90 : BASE_Y - 90;
+      P.y += (tgt - P.y) * Math.min(1, dt * 8); P.vy = 0;
+      if (pl && Math.abs(P.y - (top - 90)) < 25) { P.hover = false; P.inv = 1.2; P.ground = false; }
+    } else {
+      const prevY = P.y; P.vy += 2300 * dt; P.y += P.vy * dt;
+      if (top != null && P.vy >= 0 && prevY <= top + 6 && P.y >= top) {
+        P.y = top; P.vy = 0;
+        if (!P.ground) {
+          P.ground = true; P.jumps = 0; P.sq = 0.62;
+          const d = Math.abs(((t - beat.offset) / p) - Math.round((t - beat.offset) / p)) * p;
+          let lanePitch = 0.9 + pl.lane * 0.18;
+          if (d < 0.09) { perfects++; score += 50; say("PERFECT!", PX, P.y - 80, "#c2307f"); FX.pop(lanePitch + 0.5, "sine", .18); burst(PX, P.y, 8, "#ffd84d"); }
+          else if (d < 0.18) { score += 15; say("good", PX, P.y - 70, "#1b78a8"); FX.pop(lanePitch, "sine", .12); }
+          else FX.pop(lanePitch * 0.8, "sine", .08);
+        }
+      } else if (top == null || P.y > top + 6) { if (P.ground) { P.ground = false; P.jumps = Math.max(P.jumps, 1); } }
+      if (P.y > H + 80) {
+        if (P.inv <= 0) { hearts--; combo = 0; say("💔", PX, 150); FX.pop(0.35, "sawtooth", .25); if (hearts <= 0) { finish(false); return; } }
+        P.hover = true; P.y = BASE_Y - 400; P.vy = 0; P.ground = false;
+      }
+    }
+    P.inv = Math.max(0, P.inv - dt); P.sq += (1 - P.sq) * Math.min(1, dt * 10);
+    // pearls
+    for (const pe of level.pearls) {
+      if (pe.got || pe.miss) continue;
+      const x = PX + (pe.t - t) * V;
+      if (Math.hypot(x - PX, pe.y - (P.y - 34)) < 44) {
+        pe.got = true; pearlsGot++; combo++; maxCombo = Math.max(maxCombo, combo);
+        const pts = (pe.star ? 30 : 10) * (1 + Math.floor(combo / 10)); score += pts;
+        FX.pop(1.2 + (combo % 8) * 0.08, "sine", .1); burst(x, pe.y, 6, pe.star ? "#ffd84d" : "#a9e5ff");
+        if (combo % 10 === 0) say(`${combo} combo!`, PX + 60, P.y - 100, "#c2307f");
+      } else if (x < PX - 60) { pe.miss = true; combo = 0; }
+    }
+    for (const q of parts) { q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 700 * dt; q.l -= dt * 1.6; }
+    parts = parts.filter((q) => q.l > 0);
+    for (const f of floaters) { f.y -= 40 * dt; f.l -= dt * 0.9; }
+    floaters = floaters.filter((f) => f.l > 0);
+  }
+
+  /* ---------- draw ---------- */
+  const COLS = ["#d8f7ae", "#ffb3dc", "#a9e5ff", "#fff4a8", "#dccaff"];
+  function rr(x, y, w, h, r) { g.beginPath(); g.roundRect ? g.roundRect(x, y, w, h, r) : g.rect(x, y, w, h); }
+  function draw() {
+    const p = level.p, ph = (((t - beat.offset) / p) % 1 + 1) % 1, pulse = Math.max(0, 1 - ph * 2.5);
+    const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, "#cfe9ff"); bg.addColorStop(.55, "#ffd6e7"); bg.addColorStop(1, "#dff8ef");
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    // beat rings
+    g.strokeStyle = "rgba(255,255,255," + (0.7 * pulse) + ")"; g.lineWidth = 6 + 10 * pulse;
+    g.beginPath(); g.arc(W / 2, H / 2, 120 + (1 - pulse) * 260, 0, Math.PI * 2); g.stroke();
+    // parallax dots
+    g.fillStyle = "rgba(255,255,255,.7)";
+    for (let i = 0; i < 26; i++) { const x = ((i * 137 - t * V * 0.25) % (W + 60) + W + 60) % (W + 60) - 30, y = (i * 83) % 330 + 20; g.beginPath(); g.arc(x, y, 3 + (i % 3) * 2 + pulse * 2, 0, 7); g.fill(); }
+    // platforms
+    for (const pl of level.plats) {
+      const x0 = PX + (pl.ts - t) * V, x1 = PX + (pl.te - t) * V; if (x1 < -20 || x0 > W + 20) continue;
+      const y = platTop(pl), w = x1 - x0, hgt = 26 + pulse * 3;
+      g.fillStyle = "rgba(35,32,58,.18)"; rr(x0, y + 10, w, hgt, 14); g.fill();
+      const gr = g.createLinearGradient(0, y, 0, y + hgt); gr.addColorStop(0, "#fff"); gr.addColorStop(.25, COLS[pl.col]); gr.addColorStop(1, COLS[pl.col]);
+      g.fillStyle = gr; g.strokeStyle = "#23203a"; g.lineWidth = 3.5; rr(x0, y, w, hgt, 14); g.fill(); g.stroke();
+      g.fillStyle = "rgba(255,255,255,.7)"; rr(x0 + 10, y + 4, Math.min(60, w - 20), 5, 3); g.fill();
+    }
+    // pearls
+    for (const pe of level.pearls) {
+      if (pe.got) continue; const x = PX + (pe.t - t) * V; if (x < -30 || x > W + 30) continue;
+      const bob = Math.sin(t * 6 + pe.t) * 4, r = (pe.star ? 17 : 13) + pulse * 3;
+      g.font = r * 2 + "px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(pe.star ? "⭐" : "🧋", x, pe.y + bob);
+    }
+    // bunny
+    const sq = P.sq, bw = 60 / sq, bh = 82 * sq * (bunny.naturalHeight ? 1 : 1);
+    g.save(); g.translate(PX, P.y); g.rotate(P.ground ? 0 : Math.max(-0.35, Math.min(0.35, P.vy / 2400)));
+    if (P.inv > 0 && Math.floor(P.inv * 10) % 2) g.globalAlpha = .45;
+    g.fillStyle = "rgba(35,32,58,.18)"; g.beginPath(); g.ellipse(0, 4, 26, 6, 0, 0, 7); g.fill();
+    if (bunny.complete && bunny.naturalWidth) g.drawImage(bunny, -bw / 2, -bh, bw, bh); else { g.font = "60px serif"; g.textAlign = "center"; g.fillText("🐰", 0, -10); }
+    g.restore();
+    // particles + floaters
+    for (const q of parts) { g.globalAlpha = Math.max(0, q.l); g.fillStyle = q.c; g.strokeStyle = "#23203a"; g.lineWidth = 2; g.beginPath(); g.arc(q.x, q.y, 6, 0, 7); g.fill(); g.stroke(); }
+    g.globalAlpha = 1; g.font = "800 28px Baloo 2, Fredoka, sans-serif"; g.textAlign = "center";
+    for (const f of floaters) { g.globalAlpha = Math.max(0, f.l); g.lineWidth = 5; g.strokeStyle = "#fff"; g.strokeText(f.text, f.x, f.y); g.fillStyle = f.col; g.fillText(f.text, f.x, f.y); }
+    g.globalAlpha = 1;
+    // HUD
+    g.textAlign = "left"; g.font = "700 26px Fredoka, sans-serif"; g.fillStyle = "#23203a"; g.fillText("Score " + score, 20, 40);
+    g.font = "600 20px Fredoka, sans-serif"; g.fillText(combo > 1 ? "Combo ×" + combo : "", 20, 68);
+    g.textAlign = "right"; g.font = "28px serif"; g.fillText("💙".repeat(Math.max(0, hearts)) + "🤍".repeat(Math.max(0, 3 - hearts)), W - 20, 42);
+    const prog = Math.max(0, Math.min(1, t / level.dur));
+    g.fillStyle = "#fff"; g.strokeStyle = "#23203a"; g.lineWidth = 3; rr(20, H - 26, W - 40, 12, 6); g.fill(); g.stroke();
+    g.fillStyle = "#ff9ccf"; rr(20, H - 26, Math.max(12, (W - 40) * prog), 12, 6); g.fill(); g.stroke();
+  }
+
+  let lastF = performance.now();
+  (function loop(now) {
+    const dt = Math.min(0.05, (now - lastF) / 1000); lastF = now;
+    if (level && cur) { if (running) update(dt); draw(); }
+    else { g.fillStyle = "#cfe9ff"; g.fillRect(0, 0, W, H); }
+    requestAnimationFrame(loop);
+  })(performance.now());
+
+  /* ---------- menu / loading ---------- */
+  const status = $("#analysis"), startBtn = $("#start"), tune = $("#tune"), bpmIn = $("#bpm");
+  function applyBeat() { beat.bpm = parseFloat(bpmIn.value) || beat.bpm; level = buildLevel(cur.duration); reset_idle(); }
+  function reset_idle() { reset(); running = false; t = 0; }
+  async function loadTrack(title, url, getBuffer) {
+    startBtn.disabled = true; tune.hidden = true; status.textContent = "Listening to the beat… 🎧";
+    try {
+      const ab = await getBuffer();
+      const info = await analyse(ab);
+      audio.src = url; audio.load();
+      cur = { title, duration: info.duration }; beat.bpm = info.bpm; beat.offset = info.offset;
+      bpmIn.value = info.bpm; reset_idle();
+      status.textContent = `Detected about ${info.bpm} BPM. If the platforms feel off-beat, tweak BPM or nudge the beat.`;
+      tune.hidden = false; startBtn.disabled = false; FX.toast("🎵 " + title + " ready!");
+    } catch (e) {
+      console.error(e); cur = null;
+      status.textContent = "Couldn't read that audio here. If you opened this from a file:// link, run it through GitHub Pages or a local server, or try an mp3/m4a.";
+    }
+  }
+  function renderTracks() {
+    const box = $("#track-list"); box.innerHTML = "";
+    tracks.forEach((tr, i) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "jelly track-btn"; b.style.setProperty("--jc", tr.color || "#a9e5ff");
+      b.textContent = (tr.emoji || "🎵") + " " + tr.title; b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", () => { box.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false")); b.setAttribute("aria-pressed", "true"); loadTrack(tr.title, tr.file, () => fetch(tr.file).then((r) => r.arrayBuffer())); });
+      box.appendChild(b); if (i === 0) setTimeout(() => b.click(), 50);
+    });
+  }
+  fetch("music/tracks.json").then((r) => r.json()).catch(() => [{ title: "Hype Boy", file: "music/Hype%20Boy.m4a", emoji: "🐰", color: "#a9e5ff" }]).then((l) => { tracks = l; renderTracks(); });
+
+  $("#file").addEventListener("change", (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const url = URL.createObjectURL(f); $("#track-list").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", "false"));
+    loadTrack(f.name.replace(/\.[^.]+$/, ""), url, () => f.arrayBuffer());
+  });
+  bpmIn.addEventListener("change", applyBeat);
+  $("#x2").addEventListener("click", () => { const v = parseFloat(bpmIn.value); bpmIn.value = v > 110 ? (v / 2).toFixed(1) : (v * 2).toFixed(1); applyBeat(); });
+  $("#off-").addEventListener("click", () => { beat.offset = Math.max(0, beat.offset - 0.06 * 60 / beat.bpm * 4); applyBeat(); FX.toast("Beat nudged earlier"); });
+  $("#off\\+").addEventListener("click", () => { beat.offset += 0.06 * 60 / beat.bpm * 4; applyBeat(); FX.toast("Beat nudged later"); });
+  startBtn.addEventListener("click", start);
+  $("#again").addEventListener("click", start);
+  $("#menu-btn").addEventListener("click", () => { audio.pause(); running = false; $("#result").classList.add("hidden"); $("#menu").classList.remove("hidden"); });
+})();

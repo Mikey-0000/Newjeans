@@ -191,7 +191,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    buildBackground(); buildCursor(); buildClicks(); buildPlayer();
+    buildBackground(); if (!document.body.hasAttribute("data-no-cursor")) buildCursor(); buildClicks(); if (!document.body.hasAttribute("data-no-player")) buildPlayer();
     const saved = safe(() => localStorage.getItem("nj-theme"));
     if (saved && !document.body.dataset.member) FX.setTheme(saved, true);
   });

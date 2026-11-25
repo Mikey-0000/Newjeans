@@ -434,3 +434,19 @@ button.fact.jelly::after { display: none; }
 .quiz h2 { margin-top: 0; }
 @media (max-width: 640px) { .fact-grid { grid-template-columns: 1fr; } .meter { grid-template-columns: 80px 1fr; } }
 .songs-shell .back-link { justify-self: start; }
+
+/* ============ Bunny Beat Jump ============ */
+.game-shell { position: relative; z-index: 3; width: min(1000px, 100%); margin: 0 auto; padding: 20px 16px 120px; display: grid; gap: 22px; }
+.game-card { padding: 14px; }
+.stage { position: relative; border: 3px solid var(--ink); border-radius: 24px; overflow: hidden; background: #cfe9ff; touch-action: manipulation; }
+.stage canvas { display: block; width: 100%; height: auto; }
+.menu { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; text-align: center; background: rgba(255,255,255,.82); backdrop-filter: blur(6px); }
+.menu.hidden { display: none; }
+.menu h2 { margin: 0; font-size: 1.7rem; }
+.file-btn { display: inline-block; padding: 10px 18px; font-weight: 700; cursor: pointer; }
+.tune { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; font-weight: 600; }
+.tune input { width: 84px; font: inherit; padding: 6px 10px; border: 3px solid var(--ink); border-radius: 99px; }
+.tune button { padding: 6px 12px; font-weight: 700; font-size: 14px; --jc: #fff; }
+.track-btn { padding: 10px 18px; font-weight: 700; font-size: 17px; }
+.track-btn[aria-pressed="true"] { transform: translateY(-4px) scale(1.07); }
+@media (max-width: 640px) { .menu { gap: 8px; } .menu h2 { font-size: 1.3rem; } }

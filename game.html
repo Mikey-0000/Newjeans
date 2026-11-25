@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bunny Beat Jump · NewJeans Chat Archive</title>
+  <link rel="icon" href="assets/bunny.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="game-page" data-no-player data-no-cursor>
+  <header class="hero">
+    <h1 class="logo" id="logo" aria-label="Bunny Beat Jump"></h1>
+    <p class="tagline"><b>Jump</b> on the beat · <b>collect</b> pearls · <b>Space</b>, ↑ or tap (double jump!)</p>
+  </header>
+
+  <main class="game-shell">
+    <div class="card game-card">
+      <div class="stage" id="stage">
+        <canvas id="cv" width="960" height="540" aria-label="Bunny Beat Jump game"></canvas>
+
+        <div class="menu" id="menu">
+          <h2>Pick a song 🎵</h2>
+          <div id="track-list" class="btn-row" style="justify-content:center"></div>
+          <label class="jelly file-btn" style="--jc:#fff4a8">➕ Use my own song file
+            <input type="file" id="file" accept="audio/*,video/mp4,.m4a,.mp3,.mp4,.wav,.ogg" hidden />
+          </label>
+          <p class="hint" id="analysis">Pick a song to analyse its beat. Your file never leaves your device.</p>
+          <div class="tune" id="tune" hidden>
+            <span>BPM <input id="bpm" type="number" min="60" max="200" step="0.1" aria-label="BPM" /></span>
+            <button class="jelly" id="off-" type="button">◀ beat</button>
+            <button class="jelly" id="off+" type="button">beat ▶</button>
+            <button class="jelly" id="x2" type="button">×2 / ÷2</button>
+          </div>
+          <button class="jelly big-btn" id="start" style="--jc:#d8f7ae" disabled>▶ Start</button>
+        </div>
+
+        <div class="menu hidden" id="result">
+          <h2 id="res-title">Nice!</h2>
+          <p class="song-p" id="res-body"></p>
+          <button class="jelly big-btn" id="again" style="--jc:#ffb3dc">↻ Play again</button>
+          <button class="jelly" id="menu-btn" style="--jc:#fff;padding:12px 20px;font-weight:700">Pick another song</button>
+        </div>
+      </div>
+      <p class="hint">Land close to the beat for <b>PERFECT</b> bonuses. Fall and you lose a 💙. Want other songs? Add the file you own with “Use my own song file”.</p>
+    </div>
+    <a class="jelly back-link" href="index.html" style="justify-self:start">← Back to home</a>
+  </main>
+
+  <audio id="song" preload="auto"></audio>
+  <script src="data.js"></script>
+  <script src="fx.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
