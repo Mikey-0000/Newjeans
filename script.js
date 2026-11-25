@@ -202,7 +202,7 @@
     const im = document.createElement("img"); im.src = M[k].avatar; im.alt = ""; $("#online-stack").appendChild(im);
     const b = document.createElement("button");
     b.className = "jelly member-btn"; b.style.setProperty("--jc", M[k].color); b.setAttribute("aria-label", "Open " + M[k].name + " profile");
-    b.innerHTML = `<img src="${M[k].avatar}" alt="" /><span class="tag">${M[k].name}</span>`;
+    b.innerHTML = `<i class="ear l"></i><i class="ear r"></i><img src="${M[k].avatar}" alt="" /><span class="badge">${M[k].emoji || "💙"}</span><span class="tag">${M[k].name}</span>`;
     b.addEventListener("click", () => { FX.setTheme(k); openProfile(k); });
     $("#members").appendChild(b);
   });
