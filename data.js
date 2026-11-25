@@ -142,81 +142,80 @@ Object.assign(window.MEMBERS.hyein, {
 /* ---------- personality voice pools (original lines, not lyrics) ---------- */
 window.VOICE = {
   minji: [
-    "reminder: drink water, bunnies 💧", "the light through the window today is SO pretty ✨", "who wants to watch the sunset together?",
-    "i made a little playlist for rainy days ☔", "everyone ate? don't skip meals okay", "feeling soft and sparkly right now 🥹",
-    "i drew a tiny bunny on my notebook again 🐰", "can we have a cozy night in? blankets, snacks, music", "good morning!! even if it's not morning for you 🌤️",
-    "you're doing so well, i mean it 💛", "i hummed Ditto in the shower. again.", "sleepy but happy, the best kind of tired",
-    "a hug in text form: 🫂", "who else loves the first snow? ❄️", "I wrote something in my notes app and it's a little embarrassing hehe",
-    "stretch! shoulders down! you can do it 🧘"
+    "did everyone drink water today?", "the light is really nice right now", "I'm making tea. does anyone want some?", "please eat something real, not just snacks",
+    "found a good song for rainy days", "going to bed early tonight. for real this time", "it's so quiet out. I like it", "stretch. your shoulders are up by your ears",
+    "I rewatched an old video of us and laughed way too hard", "text me when you get home, okay?", "I put Ditto on and stared out the window for a while",
+    "can we do a cozy night? blankets, no phones (okay, a little phones)", "good morning. or good night. wherever you are", "small things are underrated",
+    "I'm proud of you. that's the whole message", "I should clean my room. I'm going to draw instead"
   ],
   hanni: [
-    "boba. now. please. 🧋", "..............", "no worries!! 🤙", "okay but what's everyone eating?",
-    "i can't decide between taro and brown sugar help", "ahh I'm so hungry, did someone say snacks??", "lol the way I just tripped on nothing",
-    "who's up for pho later? 🍜", "extra pearls, always", "hmm 🤔 ...nope forgot it", "i did a dance in the kitchen, no one saw (everyone saw)",
-    "cheers mate!! ...i mean thank you hehe", "my brain: 🧋🧋🧋🧋", "okay new hair idea. don't judge.", "that's so cute I might cry??",
-    "i miss the beach so much sometimes 🏖️"
+    "what is everyone eating", "I could really go for boba", "no worries!", "I just walked into a door. I'm fine", "pho or ramen. someone decide for me",
+    "who wants to get food", "I'm starving and I literally just ate", "brown sugar boba fixes most things", "wait, I forgot what I was going to say",
+    "this is so funny and I can't even explain why", "I miss the beach, not gonna lie", "can we get food after this?", "so tired but also wired. why",
+    "have you tried the new place near the studio? so good", "mate, that's actually crazy", "thinking about noodles. unrelated"
   ],
   danielle: [
-    "hehe 💛", "sunshine mode: ON ☀️", "aww you're so sweet!!", "ok but WHO wants to go on a walk", "let's gooo!! 🙌",
-    "I'm laughing so hard right now omg", "snack run? i'm in", "everything's better with friends 💛", "bubble tea time <3",
-    "dancing in my room again, send help 💃", "dinner at 7? say ditto if you're coming", "good vibes only today, no exceptions",
-    "you got this!! I believe in you ✨", "sending you a big hug 🤗", "the sky is so blue today it's unreal", "can i get a high five? ✋"
+    "okay, who wants to go for a walk?", "the weather is so nice today", "you've got this, seriously", "I'm so excited about this", "that made my whole day",
+    "can someone come get snacks with me?", "I saw the cutest dog today", "let's do something fun this weekend", "I laughed so hard my stomach hurts",
+    "good morning! feeling good today", "dinner at 7? say ditto if you're in", "send me that song", "I love when everyone's in the same room",
+    "you guys are the best, I mean it", "I need a high five", "the sky looks insane right now"
   ],
   haerin: [
-    "와", "...hi.", "meow.", "no.", "okay.", "hm.", "*stares quietly* 🐱", "I'm here. just watching.", "that's actually funny. don't tell anyone I said that.",
-    "I'm at the window. the birds are cool.", "*knocks your cup off the table*", "what's your ETA?", "napping. do not disturb 😴",
-    "...cute.", "ugh fine, I'll come. ;)", "I like the quiet. but also you guys. a little.", "meow >.<"
+    "hm.", "no.", "okay.", "...fine.", "I'm here.", "that was funny.", "tired.", "I'm looking out the window.", "I was going to say something but I forgot",
+    "don't ask", "I don't mind", "you can sit here", "I'll come. but I'm leaving early", "sure.", "I like this one", "quiet today",
+    "I'm not ignoring you. I'm just not typing", "...what's your ETA?"
   ],
   hyein: [
-    "alien mode 👽", "random thought: what if pizza but sweeter??", "HELLO BUNNIES <3", "okay hear me out. cats in hats. thoughts?",
-    "i found a weird song and now it's my entire personality", "the moon looks fake today 🌝", "who wants to hear a fun fact I made up??",
-    "i'm not bored. i'm just collecting chaos", "unpopular opinion: jelly shoes are elite", "beep boop 🛸", "Passion by PinkPantheress goes SO hard, just saying",
-    "can we get ice cream even though it's cold", "i just spun in my chair 11 times. 11.", "what if we all dressed matching tomorrow", "ahaha no way 😭😭", "i love you guys!! (ew, delete that) (no, keep it)"
+    "random thought: what if pizza was sweeter", "okay, hear me out", "I found the weirdest song and I've played it nine times", "unpopular opinion: jelly shoes are elite",
+    "who's awake?", "I'm bored. entertain me", "the moon looks fake tonight", "can we get ice cream even though it's cold?", "wait wait wait, I have an idea",
+    "I spun in my chair and now I'm dizzy", "what if we all wore matching hoodies tomorrow?", "no way. NO WAY", "fun fact (I made it up): pigeons can read",
+    "I'm not hungry. I'm just thinking about snacks", "okay but have you heard Passion by PinkPantheress?", "I'll be quiet. (I won't)"
   ]
 };
 
 /* small multi-message chats that play out between members */
 window.THREADS = [
-  [["hanni", "boba run?? 🧋"], ["danielle", "yes!!! say ditto if you're coming"], ["haerin", "...ditto."], ["hyein", "can I get one with extra everything"]],
-  [["minji", "did everyone eat today?"], ["hanni", "define eat"], ["minji", "Hanni!!"], ["hanni", "hehe okay okay, i had noodles 🍜"]],
-  [["hyein", "random question: aliens or mermaids"], ["haerin", "cats."], ["danielle", "mermaids!! obviously ☀️"], ["hyein", "wow the betrayal 👽"]],
-  [["danielle", "the sunset is unreal right now"], ["minji", "send a pic!!! ✨"], ["haerin", "I'm looking at it. it's good."], ["hanni", "ugh I missed it, I was napping"]],
-  [["haerin", "meow."], ["hyein", "she speaks!!"], ["haerin", "...don't make it weird."], ["minji", "we love you Haerin 💛"]],
-  [["hanni", ".............."], ["minji", "Hanni, are you okay?"], ["hanni", "I'm out of boba. this is a tragedy."], ["danielle", "emergency boba delivery 🚨🧋"]],
-  [["minji", "playlist night tonight?"], ["hyein", "yes!! i'll add the weird ones"], ["danielle", "I'll bring snacks"], ["haerin", "I'll bring... myself."], ["hanni", "that's all we need 😭"]],
-  [["danielle", "ok motivation check: how's everyone feeling?"], ["minji", "soft and sparkly ✨"], ["hanni", "hungry"], ["haerin", "sleepy"], ["hyein", "chaotic 👽"], ["danielle", "perfect, we're balanced 😂"]],
-  [["hyein", "who's up"], ["haerin", "me."], ["hyein", "why"], ["haerin", "...insomnia. and you?"], ["hyein", "i invented a new snack"]],
-  [["minji", "it's cold out, bundle up!!"], ["hanni", "yes mom 🧋"], ["minji", "I'm not your mom!!"], ["danielle", "she is a little bit our mom ngl"]]
+  [["hanni", "boba run?"], ["danielle", "yes. say ditto if you're coming"], ["haerin", "ditto."], ["hyein", "can I get one with extra everything"]],
+  [["minji", "did everyone eat today?"], ["hanni", "define eat"], ["minji", "Hanni."], ["hanni", "I had noodles! ...two hours ago"]],
+  [["hyein", "aliens or mermaids"], ["haerin", "cats."], ["hyein", "that wasn't an option"], ["haerin", "it is now"], ["danielle", "mermaids, obviously"]],
+  [["danielle", "look at the sunset right now"], ["minji", "send a pic!"], ["haerin", "I'm looking at it. it's good."], ["hanni", "I missed it. I was napping"]],
+  [["hanni", "I'm out of boba"], ["minji", "Hanni, are you okay?"], ["hanni", "no"], ["danielle", "emergency boba. I'm ordering"]],
+  [["minji", "playlist night?"], ["hyein", "yes, I'll add the weird ones"], ["danielle", "I'll bring snacks"], ["haerin", "I'll bring myself"], ["hanni", "honestly that's enough"]],
+  [["danielle", "mood check, how's everyone?"], ["minji", "calm"], ["hanni", "hungry"], ["haerin", "sleepy"], ["hyein", "chaotic"], ["danielle", "perfect, we're balanced"]],
+  [["hyein", "who's up"], ["haerin", "me"], ["hyein", "why"], ["haerin", "can't sleep"], ["hyein", "I invented a snack. toast but with ice cream"], ["haerin", "...that exists"], ["hyein", "not like mine"]],
+  [["minji", "it's cold, bundle up"], ["hanni", "yes mum"], ["minji", "I'm not your mum"], ["danielle", "you kind of are"]],
+  [["haerin", "who took my charger"], ["hyein", "not me"], ["hanni", "not me"], ["danielle", "...I'll bring it back tomorrow"]],
+  [["hanni", "taro or brown sugar"], ["danielle", "brown sugar"], ["minji", "taro"], ["haerin", "both"], ["hanni", "that's what I did"]]
 ];
 
 /* extra personal notes on each member's own page */
 Object.assign(window.MEMBERS.minji, { extra: [
-  { text: "Notes app, 2am: be kind, drink water, look at the sky more.", time: "11:58" },
-  { text: "if I could bottle a feeling it would be the first warm day after winter ☀️", time: "11:59", small: true },
-  { text: "to every bunny reading this: you're allowed to take it slow 💛", time: "12:00" },
-  { text: "Ditto still makes me feel quiet and warm at the same time.", time: "12:01", small: true }
+  { text: "Notes app, 2am: be kind. drink water. look at the sky more.", time: "11:58" },
+  { text: "I think comfort is a skill. I'm still practising.", time: "11:59", small: true },
+  { text: "To anyone reading this: you're allowed to go slow.", time: "12:00" },
+  { text: "Ditto is what I play when I want the day to be quieter.", time: "12:01", small: true }
 ]});
 Object.assign(window.MEMBERS.hanni, { extra: [
-  { text: "Hot take: every problem looks smaller with a boba in hand.", time: "11:58" },
-  { text: "ranking today's moods: 1. hungry 2. sleepy 3. hungry again", time: "11:59", small: true },
-  { text: "no worries!! we'll figure it out 🤙", time: "12:00" },
-  { text: "also yes, i do talk about food too much. no, i will not stop.", time: "12:01", small: true }
+  { text: "Hot take: most problems get smaller with a boba in your hand.", time: "11:58" },
+  { text: "Ranking today's moods: 1. hungry 2. sleepy 3. hungry again", time: "11:59", small: true },
+  { text: "No worries, we'll figure it out.", time: "12:00" },
+  { text: "Yes, I talk about food a lot. No, I'm not stopping.", time: "12:01", small: true }
 ]});
 Object.assign(window.MEMBERS.danielle, { extra: [
-  { text: "if the day feels heavy, go find some sun. even a little counts ☀️", time: "11:58" },
-  { text: "friends + snacks + music = my whole personality", time: "11:59", small: true },
-  { text: "Bubble Gum is such a bounce-around-the-room song, I can't sit still 🫧", time: "12:00" },
-  { text: "say it with me: you're doing great. ditto :)", time: "12:01", small: true }
+  { text: "If the day feels heavy, go find some sun. Even a little helps.", time: "11:58" },
+  { text: "Friends, snacks, music. That's the whole plan.", time: "11:59", small: true },
+  { text: "Bubble Gum makes it impossible to sit still.", time: "12:00" },
+  { text: "You're doing better than you think. Ditto.", time: "12:01", small: true }
 ]});
 Object.assign(window.MEMBERS.haerin, { extra: [
-  { text: "I don't say much. but I notice everything. 🐱", time: "11:58" },
-  { text: "quiet mornings > loud mornings.", time: "11:59", small: true },
-  { text: "Hurt is the one I put on when it's raining and I'm in a mood.", time: "12:00" },
-  { text: "...okay fine, I like it when you're here. meow.", time: "12:01", small: true }
+  { text: "I don't say much. I notice a lot.", time: "11:58" },
+  { text: "Quiet mornings beat loud ones.", time: "11:59", small: true },
+  { text: "Hurt is what I put on when it's raining and I'm in a mood.", time: "12:00" },
+  { text: "I like having people around. Don't tell anyone.", time: "12:01", small: true }
 ]});
 Object.assign(window.MEMBERS.hyein, { extra: [
-  { text: "my brain has 47 tabs open and 46 are about snacks 👽", time: "11:58" },
-  { text: "theory: the moon is a giant night-light for aliens", time: "11:59", small: true },
-  { text: "being the youngest means I get to say the weirdest things first", time: "12:00" },
-  { text: "How Sweet on repeat while I do absolutely nothing. perfect day.", time: "12:01", small: true }
+  { text: "My brain has 47 tabs open and 46 are about snacks.", time: "11:58" },
+  { text: "Theory: the moon is a night-light for aliens.", time: "11:59", small: true },
+  { text: "Being the youngest means I get to say the weird things first.", time: "12:00" },
+  { text: "How Sweet on repeat while I do absolutely nothing. Perfect day.", time: "12:01", small: true }
 ]});

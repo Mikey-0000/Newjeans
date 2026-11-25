@@ -128,11 +128,11 @@
   let expectName = false;
   const saveMem = () => safe(() => localStorage.setItem("nj-mem", JSON.stringify(memory.slice(-6))));
   const NIGHT = {
-    minji: ["it's so late, are you drinking water? 💧", "late-night thoughts hit different ✨", "the moon is out, say hi 🌙"],
-    hanni: ["why are we awake... boba at midnight is a mood", "midnight snack time 🧋", "..............sleepy"],
-    danielle: ["night owls unite 🦉", "late-night chats are the best 💛", "stars are out, so are we ✨"],
-    haerin: ["night is better. quiet.", "meow. 🌙", "the cat is awake. unfortunately."],
-    hyein: ["3am thoughts: are clouds just sky socks?", "aliens are most active at night 👽", "ghost hours, let's go 🛸"]
+    minji: ["it's late. are you drinking water?", "late-night thoughts are the honest ones", "the moon's out, go look"],
+    hanni: ["why are we awake. midnight boba though", "midnight snack time", "so sleepy. can't stop though"],
+    danielle: ["night owls, hi", "late-night chats are the best", "the stars are out tonight"],
+    haerin: ["night is better. quiet.", "still up. don't ask", "everyone's asleep. good."],
+    hyein: ["3am thought: are clouds just sky socks?", "ghost hours. let's go", "aliens are most active at night, I read it somewhere"]
   };
   function timeGreeting() { const h = new Date().getHours(); return h < 5 ? "it's so late" : h < 12 ? "good morning" : h < 18 ? "good afternoon" : h < 22 ? "good evening" : "good night"; }
   function nameFromText(text) {
@@ -143,8 +143,8 @@
   }
   function personalLine() {
     const r = Math.random();
-    if (userName && r < 0.35) return pick([`${userName}!! 💙`, `hi ${userName}, we missed you`, `${userName} is here! everyone say hi`, `${userName}, you okay? ✨`, `${userName}, tell us about your day`, `we love you, ${userName} 🐰`]);
-    if (memory.length && r < 0.55) { const m = pick(memory); return pick([`wait, ${userName || "you"} said "${m}" earlier, I'm still thinking about that`, `going back to "${m}" — honestly relatable`, `ok but ${userName || "bunny"}, about "${m}"...`]); }
+    if (userName && r < 0.35) return pick([`hi ${userName}`, `${userName}! good timing`, `oh, ${userName}'s here`, `${userName}, you okay?`, `${userName}, how was your day?`, `welcome back, ${userName}`]);
+    if (memory.length && r < 0.55) { const m = pick(memory); return pick([`wait, ${userName || "you"} said "${m}" earlier. still thinking about it`, `going back to "${m}". honestly relatable`, `about "${m}" earlier...`]); }
     return null;
   }
 
@@ -168,29 +168,29 @@
   }
   const SPECIAL = {
     ditto: ["Oh say it ditto :)", "danielle"],
-    "hype boy": ["Hype Boy!! turn it up 🎵", "hyein"],
+    "hype boy": ["Hype Boy. turn it up", "hyein"],
     eta: ["What's your ETA?", "haerin"]
   };
 
   /* ---------- chat commands (/help, /dance, /boba ...) ---------- */
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const COMMANDS = {
-    help: async () => { await say("minji", "commands: /dance /boba /meow /alien /hug /music /night /ditto /roll /luck 💙", 700); await say("hanni", "try them all!! 🧋", 600); },
-    dance: async () => { FX.party && FX.party(); await say("danielle", "💃💃 dance break!! 💃💃", 600); await say("hyein", "*robot dance* beep boop 👽", 700); await say("hanni", "I can't stop, send help 😂", 700); await say("haerin", "...okay one spin. 🐱", 700); },
-    boba: async () => { FX.rain(["🧋", "🧋", "🫧", "💙"], 36); await say("hanni", "BOBA?! 🧋🧋🧋", 500); await say("danielle", "boba round!! who's paying 😂", 700); await say("haerin", "tapioca. yes.", 600); },
-    meow: async () => { await say("haerin", "meow.", 500); await say("hyein", "meow?? 🐱 omg she did it", 700); await say("minji", "haerin-ah 😭💙", 700); },
-    alien: async () => { FX.rain(["👽", "🛸", "✨"], 28); await say("hyein", "they have arrived 👽🛸", 500); await say("hanni", "tell them I want boba", 700); },
-    hug: async () => { FX.rain(["🫂", "💙", "🤍"], 30); for (const k of ["minji", "hanni", "danielle", "haerin", "hyein"]) await say(k, "*group hug* 🫂", 450); },
-    music: async () => { const a = FX.audio; if (a) { if (a.paused) a.play().catch(() => {}); else a.pause(); } await say("hyein", a && !a.paused ? "music on 🎵" : "music off 🔇", 500); },
+    help: async () => { await say("minji", "commands: /dance /boba /meow /alien /hug /music /night /ditto /roll /luck", 700); await say("hanni", "try them all", 600); },
+    dance: async () => { FX.party && FX.party(); await say("danielle", "dance break!", 600); await say("hyein", "*robot dance*", 700); await say("hanni", "I can't stop", 700); await say("haerin", "...okay. one spin.", 700); },
+    boba: async () => { FX.rain(["🧋", "🧋", "🫧", "💙"], 36); await say("hanni", "boba??", 500); await say("danielle", "boba round. who's paying?", 700); await say("haerin", "yes.", 600); },
+    meow: async () => { await say("haerin", "meow.", 500); await say("hyein", "she did it", 700); await say("minji", "Haerin-ah", 700); },
+    alien: async () => { FX.rain(["👽", "🛸", "✨"], 28); await say("hyein", "they have arrived", 500); await say("hanni", "tell them I want boba", 700); },
+    hug: async () => { FX.rain(["🫂", "💙", "🤍"], 30); for (const k of ["minji", "hanni", "danielle", "haerin", "hyein"]) await say(k, "*group hug*", 450); },
+    music: async () => { const a = FX.audio; if (a) { if (a.paused) a.play().catch(() => {}); else a.pause(); } await say("hyein", a && !a.paused ? "music on" : "music off", 500); },
     night: async () => { const n = document.getElementById("st-night"); if (n) { n.checked = !n.checked; n.dispatchEvent(new Event("change")); } await say("haerin", FX.isNight() ? "night. good." : "day mode. too bright.", 600); },
-    ditto: async () => { FX.setTrack && FX.setTrack("ditto", true); await say("danielle", "Oh say it ditto :)", 600); await say("minji", "turning it up 🌙", 700); },
-    roll: async () => { const k = KEYS[Math.floor(Math.random() * KEYS.length)]; await say(k, "🎲 the dice picked me!! hehe", 700); FX.setTheme(k); },
-    luck: async () => { await say("minji", "today's luck is waiting in the Daily club 🌟 (check in for a fortune!)", 700); }
+    ditto: async () => { FX.setTrack && FX.setTrack("ditto", true); await say("danielle", "Oh say it ditto :)", 600); await say("minji", "turning it up", 700); },
+    roll: async () => { const k = KEYS[Math.floor(Math.random() * KEYS.length)]; await say(k, "the dice picked me", 700); FX.setTheme(k); },
+    luck: async () => { await say("minji", "your fortune is waiting in the Daily club", 700); }
   };
   async function runCommand(text) {
     const name = text.slice(1).trim().split(/\s+/)[0].toLowerCase(); const fn = COMMANDS[name];
     addMessage({ me: true, text }); FX.pop(1.5); paused = true; busy = true;
-    if (fn) { FX.badge && FX.badge("chat"); await fn(); } else await say("minji", `hmm, I don't know /${name} — try /help 💙`, 700);
+    if (fn) { FX.badge && FX.badge("chat"); await fn(); } else await say("minji", `hm, I don't know /${name}. try /help`, 700);
     paused = false; busy = false;
   }
   async function userSays(text) {
@@ -235,7 +235,7 @@
   {
     const d = new Date().toLocaleDateString("en-CA"); let h = 11; for (const c of d) h = (h * 33 + c.charCodeAt(0)) >>> 0;
     const k = KEYS[h % KEYS.length], m = M[k];
-    const HELLO = { minji: "good morning, bunnies!! I'm member of the day, so everyone be soft today 💙", hanni: "it's MY day!! member of the day = boba day 🧋", danielle: "hehe member of the day!! sunshine mode on ☀️", haerin: "...member of the day. okay. meow.", hyein: "member of the day?? the aliens chose well 👽" };
+    const HELLO = { minji: "morning. I'm member of the day, so be nice to me", hanni: "it's my day. so it's a boba day", danielle: "member of the day! let's make it a good one", haerin: "...member of the day. okay.", hyein: "member of the day? the aliens chose well" };
     const tag = document.querySelector(".tagline");
     if (tag) { const pill = document.createElement("a"); pill.className = "jelly motd"; pill.href = m.page; pill.style.setProperty("--jc", m.color); pill.innerHTML = `⭐ Member of the day: <b>${m.name}</b> ${m.emoji || ""}`; tag.insertAdjacentElement("afterend", pill); }
     if (safe(() => localStorage.getItem("nj-motd")) !== d) {
