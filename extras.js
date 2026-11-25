@@ -28,6 +28,8 @@
     <div class="st-links">${pages.map(([h, t]) => `<a class="jelly st-link${h === here ? " here" : ""}" href="${h}">${t}</a>`).join("")}</div>
     <label class="st-row"><span>🌙 Night mode</span><input type="checkbox" id="st-night" /></label>
     <label class="st-row"><span>🪄 Lightstick cursor</span><input type="checkbox" id="st-cur" /></label>
+    <label class="st-row"><span>🧘 Reduce motion</span><input type="checkbox" id="st-rm" /></label>
+    <label class="st-row"><span>🔎 Larger text</span><input type="checkbox" id="st-big" /></label>
     <label class="st-row"><span>🔊 UI sounds</span><input type="range" id="st-vol" min="0" max="1" step="0.05" aria-label="UI sound volume" /></label>`;
   body.append(gear, panel);
   $("#st-cur").checked = FX.cursorOn ? FX.cursorOn() : false; $("#st-cur").disabled = !FX.setCursor;
@@ -35,9 +37,93 @@
   $("#st-night").checked = FX.isNight(); $("#st-vol").value = FX.vol;
   $("#st-night").addEventListener("change", (e) => { applyNight(e.target.checked); FX.toast(e.target.checked ? "🌙 Night mode" : "☀️ Day mode"); FX.pop(e.target.checked ? 0.6 : 1.5); });
   $("#st-vol").addEventListener("input", (e) => { FX.vol = parseFloat(e.target.value); set("nj-vol", FX.vol); FX.pop(1.2); });
+  const eggRow = document.createElement("div"); eggRow.className = "st-eggs"; eggRow.id = "st-eggs"; panel.appendChild(eggRow);
   gear.addEventListener("click", () => { panel.hidden = !panel.hidden; gear.setAttribute("aria-expanded", String(!panel.hidden)); gear.textContent = panel.hidden ? "🐰" : "✕"; });
   document.addEventListener("pointerdown", (e) => { if (!panel.hidden && !panel.contains(e.target) && e.target !== gear) { panel.hidden = true; gear.textContent = "🐰"; gear.setAttribute("aria-expanded", "false"); } });
   addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) { panel.hidden = true; gear.textContent = "🐰"; } });
+
+
+  /* ---------- accessibility: reduce motion, larger text, keyboard ---------- */
+  const osRM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function applyRM(on) {
+    body.classList.toggle("rm", on); FX.reduced = on; set("nj-rm", on ? "1" : "0");
+  }
+  function applyBig(on) { body.classList.toggle("big", on); set("nj-big", on ? "1" : "0"); }
+  const _burst = FX.burst, _rain = FX.rain;
+  if (_burst) FX.burst = function () { if (FX.reduced) return; return _burst.apply(this, arguments); };
+  if (_rain) FX.rain = function (a, n) { if (FX.reduced) return; return _rain.call(this, a, n); };
+  applyRM(get("nj-rm", osRM ? "1" : "0") === "1"); applyBig(get("nj-big", "0") === "1");
+  $("#st-rm").checked = body.classList.contains("rm"); $("#st-big").checked = body.classList.contains("big");
+  $("#st-rm").addEventListener("change", (e) => { applyRM(e.target.checked); FX.toast(e.target.checked ? "🧘 Motion reduced" : "Motion back on"); });
+  $("#st-big").addEventListener("change", (e) => { applyBig(e.target.checked); FX.toast(e.target.checked ? "🔎 Larger text" : "Normal text size"); });
+
+  // skip link + landmark
+  const mainEl = document.querySelector("main"); if (mainEl) { mainEl.id = mainEl.id || "main"; mainEl.setAttribute("tabindex", "-1"); }
+  const skip = document.createElement("a"); skip.className = "skip-link"; skip.href = "#" + (mainEl ? mainEl.id : "main"); skip.textContent = "Skip to content";
+  skip.addEventListener("click", (e) => { if (mainEl) { e.preventDefault(); mainEl.focus(); mainEl.scrollIntoView({ block: "start" }); } });
+  body.prepend(skip);
+  // keyboard users get a clear focus ring; mouse users never see one
+  addEventListener("keydown", (e) => { if (e.key === "Tab") body.classList.add("kbd"); });
+  addEventListener("pointerdown", () => body.classList.remove("kbd"));
+  // arrow keys move along rows of buttons (members, CDs)
+  document.addEventListener("keydown", (e) => {
+    if (!["ArrowLeft", "ArrowRight"].includes(e.key) || e.target.matches("input,textarea,select,[role=slider]")) return;
+    const row = e.target.closest && e.target.closest(".member-grid, .cd-rack, .cd-row, .tv-list"); if (!row) return;
+    const items = [...row.querySelectorAll("button")]; const i = items.indexOf(e.target.closest("button")); if (i < 0) return;
+    e.preventDefault(); items[(i + (e.key === "ArrowRight" ? 1 : -1) + items.length) % items.length].focus();
+  });
+  // let the Escape key close the menu popup in the player
+  addEventListener("keydown", (e) => { if (e.key === "Escape") { const m = document.getElementById("mp-menu"); if (m && !m.hidden) { m.hidden = true; } } });
+
+  /* ---------- easter-egg hunt ---------- */
+  const EGGS = [
+    ["konami", "🎮", "Old-school code", "Try a famous cheat code on your keyboard…"],
+    ["ditto", "🌙", "Say the magic word", "Type a certain song title while looking at the page."],
+    ["credit", "💙", "Meet the maker", "Someone signed the home page. Give them a poke."],
+    ["gear", "🐰", "Bunny button", "The bunny in the corner likes lots of attention."],
+    ["sparkle", "✨", "Hidden sparkle", "One page has a faint sparkle hiding near an edge."],
+    ["spin", "💿", "Disc jockey", "Keep tapping a spinning CD."]
+  ];
+  const found = () => { try { return JSON.parse(get("nj-eggs", "[]")); } catch (e) { return []; } };
+  function renderEggs() {
+    const f = found(); const el = $("#st-eggs"); if (!el) return;
+    el.innerHTML = `<b>🥚 Secrets found: ${f.length}/${EGGS.length}</b><div class="egg-row">${EGGS.map(([k, em, nm, hint]) => `<span class="egg ${f.includes(k) ? "got" : ""}" title="${f.includes(k) ? nm : hint}" aria-label="${f.includes(k) ? nm + " found" : "Hint: " + hint}">${f.includes(k) ? em : "❔"}</span>`).join("")}</div>${f.length < EGGS.length ? `<small>Hover a ❔ for a hint.</small>` : `<small>You found them all! 🏆</small>`}`;
+  }
+  FX.egg = function (k) {
+    const f = found(); if (f.includes(k)) return; const e = EGGS.find((x) => x[0] === k); if (!e) return;
+    f.push(k); set("nj-eggs", JSON.stringify(f)); renderEggs();
+    FX.toast(e[1] + " Secret found: " + e[2] + " (" + f.length + "/" + EGGS.length + ")"); FX.pop(2, "triangle");
+    if (!FX.reduced) FX.rain([e[1], "✨", "🥚"], 24);
+    if (f.length === EGGS.length) setTimeout(() => { FX.toast("🏆 All secrets found! You're a true Bunny!"); FX.party && FX.party(); }, 1200);
+  };
+  renderEggs();
+  // 2: type "ditto" outside text fields
+  let typed = "";
+  addEventListener("keydown", (e) => { if (e.target.matches && e.target.matches("input,textarea,select")) return; if (e.key.length === 1) { typed = (typed + e.key.toLowerCase()).slice(-5); if (typed === "ditto") FX.egg("ditto"); } });
+  // 3: the credit tag
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#credit")) FX.egg("credit"); });
+  // 4: bunny gear x7
+  let gc = 0, gt; gear.addEventListener("click", () => { gc++; clearTimeout(gt); gt = setTimeout(() => (gc = 0), 2500); if (gc >= 7) { gc = 0; FX.egg("gear"); } });
+  // 6: tap CDs 10 times
+  let sc = 0, st; document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest(".cd-disc, .cd-item, .k-disc")) { sc++; clearTimeout(st); st = setTimeout(() => (sc = 0), 4000); if (sc >= 10) { sc = 0; FX.egg("spin"); } } });
+  // 5: a faint sparkle on one page
+  { const spots = { "index.html": [97, 62], "songs.html": [3, 88], "wall.html": [95, 90], "photobooth.html": [4, 70], "game.html": [96, 40], "concert.html": [4, 45] }; const sp = spots[here] || [3, 92];
+    const b = document.createElement("button"); b.className = "egg-sparkle"; b.type = "button"; b.textContent = "✨"; b.setAttribute("aria-label", "A hidden sparkle");
+    b.style.left = sp[0] + "%"; b.style.top = sp[1] + "%"; b.addEventListener("click", () => { b.classList.add("popped"); FX.egg("sparkle"); }); body.appendChild(b); }
+  // 1: Konami (hook existing party)
+
+  /* ---------- loading screen (once per visit) ---------- */
+  if (!safe(() => sessionStorage.getItem("nj-loaded"))) {
+    safe(() => sessionStorage.setItem("nj-loaded", "1"));
+    const ld = document.createElement("div"); ld.className = "loader"; ld.setAttribute("role", "status"); ld.setAttribute("aria-label", "Loading");
+    ld.innerHTML = `<div class="ld-stage"><img class="ld-cd" src="assets/cd-howsweet.png" alt="" /><img class="ld-bunny" src="assets/bunny.png" alt="" /></div><b class="ld-text">Loading<span>.</span><span>.</span><span>.</span></b><div class="ld-bar"><i></i></div>`;
+    body.appendChild(ld);
+    const t0 = performance.now(); let gone = false;
+    const hide = () => { if (gone) return; gone = true; ld.classList.add("out"); setTimeout(() => ld.remove(), 600); };
+    const done = () => setTimeout(hide, Math.max(0, 900 - (performance.now() - t0)));
+    if (document.readyState === "complete") done(); else addEventListener("load", done, { once: true });
+    setTimeout(hide, 4500);
+  }
 
   /* ---------- page transitions ---------- */
   const wipe = document.createElement("div"); wipe.className = "wipe"; wipe.innerHTML = "<i></i>"; body.appendChild(wipe);
@@ -57,7 +143,7 @@
   const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "KeyB", "KeyA"]; let ci = 0;
   addEventListener("keydown", (e) => {
     ci = e.code === code[ci] ? ci + 1 : (e.code === code[0] ? 1 : 0);
-    if (ci === code.length) { ci = 0; party(); }
+    if (ci === code.length) { ci = 0; party(); FX.egg && FX.egg("konami"); }
   });
   function party() {
     FX.toast("🎉 Secret bunny party unlocked!"); FX.rain(["🐰", "💿", "🧋", "⭐", "💙", "✨"], 70);

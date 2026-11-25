@@ -57,10 +57,27 @@
     playFile(URL.createObjectURL(f), null, true); note.textContent = "Playing from your device: " + f.name + " (not uploaded anywhere).";
   });
 
+  // listen along: the same tracks as the corner player, shown with a spinning CD
+  function playTrack(t, btn) {
+    clear(); mark(btn); if (FX.setTrack) FX.setTrack(t.key, true);
+    screen.innerHTML = `<div class="tv-now"><img src="${t.img}" alt="" /><b>${t.emoji} ${t.title}</b><small>Playing in the music player 🎧</small></div>`;
+    note.textContent = "";
+  }
+  document.addEventListener("nj-track", (e) => {
+    const t = e.detail; const now = screen.querySelector(".tv-now"); if (!now) return;
+    now.innerHTML = `<img src="${t.img}" alt="" /><b>${t.emoji} ${t.title}</b><small>Playing in the music player 🎧</small>`;
+    list.querySelectorAll("button[data-track]").forEach((b) => b.classList.toggle("on", b.dataset.track === t.key));
+  });
+  const tcolors = ["#a9e5ff", "#ffb3dc", "#ffd6f0"];
+  (FX.TRACKS || []).forEach((t, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "jelly"; b.dataset.track = t.key; b.style.setProperty("--jc", tcolors[i % 3]);
+    b.textContent = "🎧 " + t.title; b.addEventListener("click", () => playTrack(t, b)); list.appendChild(b);
+  });
+
   // videos you list yourself in videos/videos.json: [{ "title": "Ditto", "youtube": "ID or link" }, { "title": "How Sweet", "file": "videos/how-sweet.mp4" }]
   const colors = ["#ffb3dc", "#d8f7ae", "#dccaff", "#fff4a8", "#bfe6ff"];
   fetch("videos/videos.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : [])).catch(() => []).then((items) => {
-    if (!Array.isArray(items) || !items.length) { list.innerHTML = '<p class="hint">Add your videos to <b>videos/videos.json</b> to get quick-pick buttons here, or paste a link / pick a file below.</p>'; return; }
+    if (!Array.isArray(items) || !items.length) return;
     items.forEach((it, i) => {
       const b = document.createElement("button"); b.type = "button"; b.className = "jelly"; b.style.setProperty("--jc", colors[i % colors.length]);
       b.textContent = "▶ " + it.title;

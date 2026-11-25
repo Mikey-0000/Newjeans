@@ -2,8 +2,8 @@
 (function () {
   const { $, safe } = FX;
   const DISCS = [
-    { key: "ditto", title: "Ditto", img: "assets/cd-ditto.png?v=4", audio: ["music/ditto.m4a", "music/Ditto.m4a", "music/ditto.mp3"] },
-    { key: "howsweet", title: "How Sweet", img: "assets/cd-howsweet.png?v=5", audio: ["music/how-sweet.mp3", "music/How Sweet.mp3", "music/How%20Sweet.mp3", "music/howsweet.mp3", "music/how-sweet.m4a", "music/How%20Sweet.m4a"] }
+    { key: "ditto", title: "Ditto", img: "assets/cd-ditto.png?v=6", audio: ["music/ditto.m4a", "music/Ditto.m4a", "music/ditto.mp3"] },
+    { key: "howsweet", title: "How Sweet", img: "assets/cd-howsweet.png?v=8", audio: ["music/how-sweet.mp3", "music/How Sweet.mp3", "music/How%20Sweet.mp3", "music/howsweet.mp3", "music/how-sweet.m4a", "music/How%20Sweet.m4a"] }
   ];
   const rack = $("#cd-rack"), ov = $("#cd-overlay"), au = $("#k-audio"), lines = $("#k-lines");
   let cur = null, data = [], active = -1, rafId = 0, syncing = false, syncIdx = 0, stamps = [], rawLines = [];

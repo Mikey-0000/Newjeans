@@ -160,47 +160,83 @@
     });
   }
 
-  /* ---------- music player ---------- */
+  /* ---------- music player (with track picker) ---------- */
+  const TRACKS = [
+    { key: "hypeboy", title: "Hype Boy", emoji: "🐰", img: "assets/cd-debut.png", files: ["music/Hype%20Boy.m4a"] },
+    { key: "ditto", title: "Ditto", emoji: "🌙", img: "assets/cd-ditto.png", files: ["music/ditto.m4a", "music/Ditto.m4a", "music/ditto.mp3", "music/Ditto.mp3"] },
+    { key: "howsweet", title: "How Sweet", emoji: "🍬", img: "assets/cd-howsweet.png", files: ["music/how-sweet.m4a", "music/how-sweet.mp3", "music/How%20Sweet.m4a", "music/How%20Sweet.mp3"] }
+  ];
+  FX.TRACKS = TRACKS;
   function buildPlayer() {
     const mp = document.createElement("div");
     mp.className = "music-player jelly"; mp.setAttribute("role", "region"); mp.setAttribute("aria-label", "Music player");
     mp.innerHTML = `
       <button class="jelly play-btn idle" id="mp-play" aria-label="Play music">▶</button>
-      <div class="mp-title"><span>♫ Hype Boy</span><span class="bars" aria-hidden="true">${"<i></i>".repeat(6)}</span></div>
+      <div class="mp-title">
+        <button class="mp-step" id="mp-prev" type="button" aria-label="Previous track">‹</button>
+        <button class="mp-name" id="mp-name" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Choose a track"><span id="mp-nm">♫ Hype Boy</span> <small>▾</small></button>
+        <button class="mp-step" id="mp-next" type="button" aria-label="Next track">›</button>
+        <span class="bars" aria-hidden="true">${"<i></i>".repeat(6)}</span>
+      </div>
+      <div class="mp-menu" id="mp-menu" role="listbox" aria-label="Tracks" hidden></div>
       <div class="mp-mid"><div class="progress" id="mp-prog" role="slider" aria-label="Seek" tabindex="0"><i></i></div><button class="mute" id="mp-mute" aria-label="Mute sound effects" title="Sound effects on/off">${muted ? "🔇" : "🔊"}</button></div>
       <div class="mp-status" id="mp-status" role="status" aria-live="polite">Press ▶ to play music</div>
-      <audio id="bg-music" loop preload="metadata"><source src="music/Hype%20Boy.m4a" type="audio/mp4"></audio>`;
+      <audio id="bg-music" preload="metadata"></audio>`;
     document.body.appendChild(mp);
-    const au = $("#bg-music"), btn = $("#mp-play"), status = $("#mp-status"), prog = $("#mp-prog"), bars = [...mp.querySelectorAll(".bars i")];
-    let barT;
+    const au = $("#bg-music"), btn = $("#mp-play"), status = $("#mp-status"), prog = $("#mp-prog"), bars = [...mp.querySelectorAll(".bars i")], menu = $("#mp-menu");
+    let barT, idx = 0, fileI = 0;
     const setUI = (playing) => {
       btn.textContent = playing ? "❚❚" : "▶"; btn.classList.toggle("idle", !playing); btn.setAttribute("aria-label", playing ? "Pause music" : "Play music");
       status.textContent = playing ? "♫ Playing" : "Paused — press ▶ to resume";
       clearInterval(barT);
-      if (playing) barT = setInterval(() => bars.forEach((b) => (b.style.height = rand(4, 22) + "px")), 130);
+      if (playing && !FX.reduced) barT = setInterval(() => bars.forEach((b) => (b.style.height = rand(4, 22) + "px")), 130);
       else bars.forEach((b) => (b.style.height = "4px"));
     };
-    const toggle = () => {
-      if (au.paused) au.play().catch(() => (status.textContent = "Couldn't play — check music/Hype Boy.m4a")); else au.pause();
-    };
+    function load(i, play) {
+      idx = ((i % TRACKS.length) + TRACKS.length) % TRACKS.length; fileI = 0;
+      const t = TRACKS[idx]; $("#mp-nm").textContent = "♫ " + t.title; au.src = t.files[0]; au.load();
+      safe(() => sessionStorage.setItem("nj-track", t.key));
+      menu.querySelectorAll("button").forEach((x, n) => x.setAttribute("aria-selected", String(n === idx)));
+      $("i", prog).style.width = "0%";
+      document.dispatchEvent(new CustomEvent("nj-track", { detail: t }));
+      if (play) au.play().catch(() => {});
+    }
+    TRACKS.forEach((t, n) => {
+      const o = document.createElement("button"); o.type = "button"; o.setAttribute("role", "option"); o.innerHTML = `<img src="${t.img}" alt="" /><span>${t.emoji} ${t.title}</span>`;
+      o.addEventListener("click", () => { load(n, true); menu.hidden = true; $("#mp-name").setAttribute("aria-expanded", "false"); }); menu.appendChild(o);
+    });
+    const toggle = () => { if (au.paused) au.play().catch(() => (status.textContent = "Couldn't play — add " + TRACKS[idx].files[0])); else au.pause(); };
     // pointerdown so the press animation can never swallow the click; click only for keyboard
     btn.addEventListener("pointerdown", (e) => { e.preventDefault(); toggle(); });
     btn.addEventListener("click", (e) => { if (e.detail === 0) toggle(); });
+    $("#mp-prev").addEventListener("click", () => load(idx - 1, !au.paused || true));
+    $("#mp-next").addEventListener("click", () => load(idx + 1, true));
+    $("#mp-name").addEventListener("click", (e) => { menu.hidden = !menu.hidden; e.currentTarget.setAttribute("aria-expanded", String(!menu.hidden)); });
+    document.addEventListener("pointerdown", (e) => { if (!menu.hidden && !mp.contains(e.target)) { menu.hidden = true; $("#mp-name").setAttribute("aria-expanded", "false"); } });
     au.addEventListener("play", () => { setUI(true); safe(() => sessionStorage.setItem("nj-play", "1")); });
     au.addEventListener("pause", () => { setUI(false); safe(() => sessionStorage.setItem("nj-play", "0")); });
-    au.addEventListener("error", () => (status.textContent = "Audio could not load. Check music/Hype Boy.m4a"), true);
+    au.addEventListener("ended", () => load(idx + 1, true));
+    au.addEventListener("error", () => {
+      const t = TRACKS[idx];
+      if (fileI < t.files.length - 1) { fileI++; au.src = t.files[fileI]; au.load(); if (safe(() => sessionStorage.getItem("nj-play")) === "1") au.play().catch(() => {}); }
+      else status.textContent = "No audio found for " + t.title + " — add " + t.files[0].replace(/%20/g, " ");
+    });
     au.addEventListener("timeupdate", () => { if (au.duration) $("i", prog).style.width = (au.currentTime / au.duration) * 100 + "%"; });
     const seek = (e) => { const r = prog.getBoundingClientRect(); if (au.duration) au.currentTime = ((e.clientX - r.left) / r.width) * au.duration; };
     prog.addEventListener("click", seek);
     prog.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") au.currentTime += 5; if (e.key === "ArrowLeft") au.currentTime -= 5; });
     $("#mp-mute").addEventListener("click", (e) => { FX.setMuted(!muted); e.currentTarget.textContent = muted ? "🔇" : "🔊"; FX.toast(muted ? "Sound effects off" : "Sound effects on"); });
 
-    // continue the song across pages
+    // remember the track and carry the song across pages
+    const savedKey = safe(() => sessionStorage.getItem("nj-track")); const startI = Math.max(0, TRACKS.findIndex((t) => t.key === savedKey));
+    load(startI, false);
     const t = parseFloat(safe(() => sessionStorage.getItem("nj-time")) || "0");
     au.addEventListener("loadedmetadata", () => { if (t && t < au.duration) au.currentTime = t; }, { once: true });
     addEventListener("pagehide", () => safe(() => sessionStorage.setItem("nj-time", au.currentTime)));
     if (safe(() => sessionStorage.getItem("nj-play")) === "1") au.play().catch(() => {});
     FX.audio = au;
+    FX.setTrack = (k, play = true) => { const n = typeof k === "number" ? k : TRACKS.findIndex((x) => x.key === k); if (n >= 0) load(n, play); };
+    FX.currentTrack = () => TRACKS[idx];
   }
 
   document.addEventListener("DOMContentLoaded", () => {
