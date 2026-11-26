@@ -10,7 +10,7 @@ tar --exclude='./.git' --exclude="./$OUT" --exclude='./node_modules' --exclude='
 SITE="${SITE_URL:-$CF_PAGES_URL}"
 if [ -n "$SITE" ]; then
   SITE="${SITE%/}"
-  for f in "$OUT"/*.html; do sed -i "s#https://mikey101101.github.io/Newjeans/#$SITE/#g; s#https://mikey101101.github.io/Newjeans#$SITE#g" "$f"; done
+  for f in "$OUT"/*.html; do sed -i "s#https://mikey-0000.github.io/Newjeans/#$SITE/#g; s#https://mikey-0000.github.io/Newjeans#$SITE#g" "$f"; done
   echo "Share-card URLs set to $SITE"
 else
   echo "SITE_URL not set: share cards still point at the GitHub Pages address."
